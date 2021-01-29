@@ -983,3 +983,4 @@ class MyFrame(DF_CALCUL):
 # self.m_grid2.SetCellValue(1, 9, '1676.12')
 # self.m_grid2.SetCellValue(1, 10, '1819')
 # self.m_grid2.SetCellValue(1, 11, '3000')
+# self.m_grid2.SetCellValue(1, 11, '3000')
