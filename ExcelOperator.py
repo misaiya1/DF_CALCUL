@@ -6,6 +6,7 @@ from math import pi
 import datetime
 
 import os
+import sys
 import matplotlib.pyplot as plt
 import wx
 import wx.xrc
@@ -13,16 +14,21 @@ import math
 from docx import Document
 from docx.shared import Inches
 from docx.shared import Pt
+from docx.shared import RGBColor
 from docx.oxml.ns import qn
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 
 from docxtpl import DocxTemplate
+from pptx import Presentation
+from pptx_tools import utils
+from pptx.util import Inches, Pt
 
 myChecked = False
 NetFreq = 50
 
-
 ''' 函数：返回变量是否被定义过 '''
+
+
 def isset(v):
     try:
         type(eval(v))
@@ -34,6 +40,7 @@ def isset(v):
 
 class MyFrame(DF_CALCUL):
     ''' 创建输出路径  '''
+    global cwd
     cwd = os.getcwd()
     print(cwd)
     global outputFolderName
@@ -120,7 +127,7 @@ class MyFrame(DF_CALCUL):
         self.Plot2()
         self.Plot3()
 
-        ###################################################################
+        ###################################################################报错
         # self.Docu()
         # self.statusbar.SetStatusText('Report Generate at , %s ' % wx.Now())
         # dlg = wx.MessageDialog(None, u"报告已生成，请确认", u"完成",
@@ -128,7 +135,7 @@ class MyFrame(DF_CALCUL):
         # if dlg.ShowModal() == wx.ID_YES:
         #     self.Close(True)
         # dlg.Destroy()
-        ###################################################################
+        ###################################################################不报错
 
         try:
             self.Docu()
@@ -142,7 +149,6 @@ class MyFrame(DF_CALCUL):
             if dlg.ShowModal() == wx.ID_YES:
                 self.Close(True)
             dlg.Destroy()
-
 
     def m_slider1OnScrollChanged(self, event):
         pass
@@ -164,6 +170,7 @@ class MyFrame(DF_CALCUL):
 
         # input part
         global pp, NetFreq, TongBuZhuanSu, StatorRePower, RotorOpenVoltage, GenRpm, XiaoLv
+        global Xm, Xs, Xr, Rs, Rr
 
         pp = float(self.m_pp.GetValue())  # pp
         A2 = pp
@@ -191,21 +198,25 @@ class MyFrame(DF_CALCUL):
         ###########################################################################
         Rs = float(self.m_Rs.GetValue())  # 定子电阻
         H2 = Rs
+        print('Rs = ')
+        print(Rs)
         Rr = float(self.m_Rr.GetValue())  # 转子电阻
         I2 = Rr
 
         # myChecked = self.m_checkBox1.GetValue()
         # if isset('myChecked'):
+        tempW = NetFreq * 2 * pi
 
         if not myChecked:
             Lm = float(self.m_Lm.GetValue())  # 电机互感
             L2 = Lm
+
             Lks = float(self.m_Lks.GetValue())  # 定子漏感
             J2 = Lks
             Lkr = float(self.m_Lkr.GetValue())  # 转子漏感
             K2 = Lkr
         else:
-            tempW = NetFreq * 2 * pi
+
             Lm = float(self.m_Lm.GetValue()) / tempW  # 电机互感
             L2 = Lm
 
@@ -213,7 +224,9 @@ class MyFrame(DF_CALCUL):
             J2 = Lks
             Lkr = float(self.m_Lkr.GetValue()) / tempW  # 转子漏感
             K2 = Lkr
-
+        Xm = Lm * tempW
+        Xs = Lks * tempW
+        Xr = Lkr * tempW
         print('myChecked   HAVE %f' % myChecked)
 
         # else:
@@ -675,36 +688,67 @@ class MyFrame(DF_CALCUL):
         iTotalAPower100 = iTotalAPower
         iStatorAPower100 = iStatorAPower
         iRotorAPower100 = iRotorAPower
-        iStatorIrms100 = list(map(abs,iStatorIrms))
-        iGenIrmsSJ100 = list(map(abs,iGenIrmsSJ))
-        iNetIrms100 = list(map(abs,iNetIrms))
-        iGridrms100 = list(map(abs,iGridrms))
+        iStatorIrms100 = list(map(abs, iStatorIrms))
+        iGenIrmsSJ100 = list(map(abs, iGenIrmsSJ))
+        iNetIrms100 = list(map(abs, iNetIrms))
+        iGridrms100 = list(map(abs, iGridrms))
         iGenVrms100 = iGenVrms
 
         self.DoWork(1.1)
         iTotalAPower110 = iTotalAPower
         iStatorAPower110 = iStatorAPower
         iRotorAPower110 = iRotorAPower
-        iStatorIrms110 = list(map(abs,iStatorIrms))
-        iGenIrmsSJ110 = list(map(abs,iGenIrmsSJ))
-        iNetIrms110 = list(map(abs,iNetIrms))
-        iGridrms110 = list(map(abs,iGridrms))
+        iStatorIrms110 = list(map(abs, iStatorIrms))
+        iGenIrmsSJ110 = list(map(abs, iGenIrmsSJ))
+        iNetIrms110 = list(map(abs, iNetIrms))
+        iGridrms110 = list(map(abs, iGridrms))
         iGenVrms110 = iGenVrms
 
         self.DoWork(0.9)
         iTotalAPower90 = iTotalAPower
         iStatorAPower90 = iStatorAPower
         iRotorAPower90 = iRotorAPower
-        iStatorIrms90 = list(map(abs,iStatorIrms))
-        iGenIrmsSJ90 = list(map(abs,iGenIrmsSJ))
-        iNetIrms90 = list(map(abs,iNetIrms))
-        iGridrms90 = list(map(abs,iGridrms))
+        iStatorIrms90 = list(map(abs, iStatorIrms))
+        iGenIrmsSJ90 = list(map(abs, iGenIrmsSJ))
+        iNetIrms90 = list(map(abs, iNetIrms))
+        iGridrms90 = list(map(abs, iGridrms))
         iGenVrms90 = iGenVrms
 
         self.DoWork(1)
+        #####################################################################创建PPT,修改文本框
+        print('ppt start')
+        pptx = Presentation()
+        for slide in pptx.slides:
+            # 遍历幻灯片页的所有形状
+            print("slide found")
+            for shape in slide.shapes:
+                print("shape found")
+                # 判断形状是否含有文本框，如果含有则顺序运行代码
+                if shape.has_text_frame:
 
+                    # 获取文本框
+                    text_frame = shape.text_frame
+                    # 遍历文本框中的所有段落
+                    for paragraph in text_frame.paragraphs:
+                        paragraph.text = paragraph.text.replace('X1', str(format(Xs, '.5f')) + '[ohm]')
+                        paragraph.text = paragraph.text.replace('X2', str(format(Xr, '.5f')) + '[ohm]')
+                        paragraph.text = paragraph.text.replace('R1', str(format(Rs, '.5f')) + '[ohm]')
+                        paragraph.text = paragraph.text.replace('R2', str(format(Rr, '.5f')) + '[ohm]')
+
+                        paragraph.text = paragraph.text.replace('XNN', str(format(Xm, '.5f')) + '[ohm]')
+                        paragraph.font.size = Pt(22)
+
+        #####################################################################保存PPT,另存为png
+        save_ppt = outputFolderName + r'\fig_x.pptx'
+        pptx.save(save_ppt)
+
+        utils.save_pptx_as_png(outputFolderName, save_ppt, overwrite_folder=True)
+        fig_x_dir = outputFolderName + r'\幻灯片1.PNG'
+        print('ppt end')
+        #####################################################################创建word
         document = Document()
         # print(dir(document))
+
         document.styles['Normal'].font.name = '楷体'
 
         document.styles['Normal']._element.rPr.rFonts.set(qn('w:eastAsia'), u'楷体')
@@ -774,6 +818,19 @@ class MyFrame(DF_CALCUL):
         para_cells[3].text = self.m_Lks.GetValue()
         para_cells[4].text = self.m_Lkr.GetValue()
 
+        ########等效电路图
+        try:
+            paragraph = document.add_paragraph()
+            paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+            run = paragraph.add_run("")
+            run.add_picture(r'.\fig_save\幻灯片1.PNG', width=Inches(5.25))
+
+            run = document.add_paragraph('图1. 双馈发电机等效电路图')
+            run.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+
+        except:
+            pass
+
         ########功率表
         document.add_heading('输入-功率曲线', level=1)
         n = len(iGenRpm) - 1
@@ -798,7 +855,7 @@ class MyFrame(DF_CALCUL):
         run = paragraph.add_run("")
         run.add_picture(r'.\fig_save\fig_power.png', width=Inches(5.25))
 
-        run = document.add_paragraph('图1. 定子/转子/总上网功率')
+        run = document.add_paragraph('图2. 定子/转子/总上网功率')
         run.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
         run = document.add_paragraph('')
         run.add_run(r'"*注：对于转子功率(Rotor Active Power)，负值表示从电网获取功率"').italic = True
@@ -816,7 +873,7 @@ class MyFrame(DF_CALCUL):
         run = paragraph.add_run("")
         run.add_picture(r'.\fig_save\fig_Current.png', width=Inches(5.25))
 
-        run = document.add_paragraph('图2. 定子/转子/变流器网侧/总上网电流')
+        run = document.add_paragraph('图3. 定子/转子/变流器网侧/总上网电流')
         run.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
         run = document.add_paragraph('')
         run.add_run(r'"*注：对于变流器网侧电流(Ipfc)，负值表示流向电网"').italic = True
@@ -830,10 +887,10 @@ class MyFrame(DF_CALCUL):
             max(iGenIrmsSJ100), max(iGenIrmsSJ90), max(iGenIrmsSJ110)))
         document.add_paragraph(
             '变流器网侧电流最大值为： \t%8.3f [A],   %8.3f [A],   %8.3f [A]' % (
-            max(iNetIrms100), max(iNetIrms90), max(iNetIrms110)))
+                max(iNetIrms100), max(iNetIrms90), max(iNetIrms110)))
         document.add_paragraph(
             '总上网电流最大值为：    \t%8.3f [A],   %8.3f [A],   %8.3f [A]' % (
-            max(iGridrms100), max(iGridrms90), max(iGridrms110)))
+                max(iGridrms100), max(iGridrms90), max(iGridrms110)))
         document.add_page_break()
 
         ########输出转子电压
@@ -844,7 +901,7 @@ class MyFrame(DF_CALCUL):
         run = paragraph.add_run("")
         run.add_picture(r'.\fig_save\fig_voltageR.png', width=Inches(5.25))
 
-        run = document.add_paragraph('图3. 转子线电压')
+        run = document.add_paragraph('图4. 转子线电压')
         run.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
 
         document.add_paragraph(r'以下三个数据分别表示工况（正常电网电压）（电网90%低电压）（电网110%高电压）')
@@ -867,34 +924,41 @@ class MyFrame(DF_CALCUL):
         para_cells1 = table_para.columns[1].cells
         para_cells1[0].text = '判定标准'
 
-        TF=[True for i in range(4)]
-        para_cells1[1].text = str(format(max(max(iGenVrms90),max(iGenVrms100),max(iGenVrms110)), '.2f')) +' < ' + self.m_Vdc.GetValue() + '/1.414'
-        TF[0] = max(max(iGenVrms90),max(iGenVrms100),max(iGenVrms110)) < float(self.m_Vdc.GetValue())/1.414
+        TF = [True for i in range(4)]
+        para_cells1[1].text = str(format(max(max(iGenVrms90), max(iGenVrms100), max(iGenVrms110)),
+                                         '.2f')) + ' < ' + self.m_Vdc.GetValue() + '/1.414'
+        TF[0] = max(max(iGenVrms90), max(iGenVrms100), max(iGenVrms110)) < float(self.m_Vdc.GetValue()) / 1.414
 
-        para_cells1[2].text =  str(format(max(max(iNetIrms90),max(iNetIrms100),max(iNetIrms110)), '.2f')) +' < ' + self.m_SetNetCurMax.GetValue()
-        TF[1] =max(max(iNetIrms90),max(iNetIrms100),max(iNetIrms110)) < float(self.m_SetNetCurMax.GetValue())
+        para_cells1[2].text = str(format(max(max(iNetIrms90), max(iNetIrms100), max(iNetIrms110)),
+                                         '.2f')) + ' < ' + self.m_SetNetCurMax.GetValue()
+        TF[1] = max(max(iNetIrms90), max(iNetIrms100), max(iNetIrms110)) < float(self.m_SetNetCurMax.GetValue())
 
-        para_cells1[3].text = str(format(max(max(iGenIrmsSJ90),max(iGenIrmsSJ100),max(iGenIrmsSJ110)), '.2f')) + ' < ' + self.m_SetGenCurMax1.GetValue()
-        TF[2] =max(max(iGenIrmsSJ90),max(iGenIrmsSJ100),max(iGenIrmsSJ110)) < float(self.m_SetGenCurMax1.GetValue())
+        para_cells1[3].text = str(format(max(max(iGenIrmsSJ90), max(iGenIrmsSJ100), max(iGenIrmsSJ110)),
+                                         '.2f')) + ' < ' + self.m_SetGenCurMax1.GetValue()
+        TF[2] = max(max(iGenIrmsSJ90), max(iGenIrmsSJ100), max(iGenIrmsSJ110)) < float(self.m_SetGenCurMax1.GetValue())
 
-        para_cells1[4].text = str(format(max(max(iStatorIrms90),max(iStatorIrms100),max(iStatorIrms110)), '.2f')) + ' < ' + self.m_SetSatMaxI.GetValue()
-        TF[3] = max(max(iStatorIrms90),max(iStatorIrms100),max(iStatorIrms110))< float(self.m_SetSatMaxI.GetValue())
+        para_cells1[4].text = str(format(max(max(iStatorIrms90), max(iStatorIrms100), max(iStatorIrms110)),
+                                         '.2f')) + ' < ' + self.m_SetSatMaxI.GetValue()
+        TF[3] = max(max(iStatorIrms90), max(iStatorIrms100), max(iStatorIrms110)) < float(self.m_SetSatMaxI.GetValue())
 
         para_cells2 = table_para.columns[2].cells
         para_cells2[0].text = '是否通过'
-        para_cells2[1].text = str(TF[0])
-        para_cells2[2].text = str(TF[1])
-        para_cells2[3].text = str(TF[2])
-        para_cells2[4].text = str(TF[3])
+
+        for i in range(4):
+            p = para_cells2[i + 1].add_paragraph('')
+            run = p.add_run(str(TF[i]))
+            if TF[i] is False:
+                run.font.color.rgb = RGBColor(250, 0, 0)
+
+        # paragraph.style.font.color.rgb = RGBColor(250, 0, 0)
 
         document.add_paragraph(r'')
 
-        if all  (i== True for i in TF) :
+        if all(i == True for i in TF):
             document.add_paragraph(r'结论:设计参数校验通过。')
         else:
-            document.add_paragraph(r'结论:设计参数 %d项校验不通过！' %TF.count(False))
-
-
+            paragraph = document.add_paragraph(r'结论:设计参数 %d项校验不通过！' % TF.count(False))
+            # paragraph.style.font.color.rgb = RGBColor(250,0,0)
 
         document.add_page_break()
         document.save('双馈风电机组电驱系统设计计算报告.docx')
@@ -913,6 +977,8 @@ class MyFrame(DF_CALCUL):
         tdocx.save('test.docx')
 
         ##############################################test
+
+
 ########################################################## 3.45 盾安 MW
 
 # self.m_grid2.SetCellValue(0, 0, '1300')  # 第1行第0个

@@ -1,12 +1,13 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 block_cipher = None
-
+added_files = [('D:\\Personal\\Desktop\\skxxgj\\py\\DF_CALCUL\\pptx', 'pptx' )]
+           # ('D:\\Personal\\Desktop\\skxxgj\\py\\DF_CALCUL\\res\\default.pptxo', 'res\\default.pptx' )]
 
 a = Analysis(['main.py'],
              pathex=['D:\\Personal\\Desktop\\skxxgj\\py\\DF_CALCUL'],
              binaries=[],
-             datas=[],
+             datas=added_files,
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
