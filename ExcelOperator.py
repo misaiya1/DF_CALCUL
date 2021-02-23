@@ -944,13 +944,18 @@ class MyFrame(DF_CALCUL):
         para_cells2 = table_para.columns[2].cells
         para_cells2[0].text = '是否通过'
 
+        #1,2,3,4行
         for i in range(4):
-            p = para_cells2[i + 1].add_paragraph('')
+            p = para_cells2[i + 1].paragraphs.pop()
+            #print(dir(para_cells2[i + 1].paragraphs))
+            #print(dir(p.style))
+            #print(len(p))
+            #p.style.font.color.rgb = RGBColor(250, 0, 0)
             run = p.add_run(str(TF[i]))
             if TF[i] is False:
                 run.font.color.rgb = RGBColor(250, 0, 0)
 
-        # paragraph.style.font.color.rgb = RGBColor(250, 0, 0)
+
 
         document.add_paragraph(r'')
 
