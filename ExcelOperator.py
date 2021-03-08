@@ -739,11 +739,11 @@ class MyFrame(DF_CALCUL):
 
         """:type:HTTPResponse"""
 
-
+        global es,er,tempJWJX,data, Pmax,Qmax,Puplim,Quplim,Ppoint,Qpoint
         Ppoint = float(self.m_textPPP.GetValue()) * 1000
         Qpoint = float(self.m_textQQQ.GetValue()) * 1000
 
-        global es,er,tempJWJX,data, Pmax,Qmax,Puplim,Quplim
+
 
         xss = Xs + Xm  # 定子电抗
         print("xss = %.3f" % xss)
@@ -786,22 +786,22 @@ class MyFrame(DF_CALCUL):
                     arrowprops=dict(facecolor='green', arrowstyle="->", connectionstyle="arc3,rad=.2"),
                     )
 
-        tempStr = "Pmax = "
-        tempStr = tempStr + "%.3f" % (Puplim / 1000)
-        tempStr = tempStr + "[kW]\n"
-        tempStr = tempStr+ "When Q = %.0f [kVar]"% (Qpoint / 1000)
-
-        ax.annotate(tempStr, xy=(Qpoint, Puplim), xytext=(Qpoint - 1100000, Puplim - 200000), color='g',
-                    arrowprops=dict(facecolor='green', arrowstyle="->", connectionstyle="arc3,rad=.2"),
-                    )
-
-        tempStr = "Qmax = "
-        tempStr = tempStr + "%.3f" % (Quplim / 1000)
-        tempStr = tempStr + "[kVar]\n"
-        tempStr = tempStr+ "When P = %.0f [kW]"% (Ppoint / 1000)
-        ax.annotate(tempStr, xy=(Quplim, Ppoint), xytext=(Quplim - 1900000, Ppoint - 200000), color='g',
-                    arrowprops=dict(facecolor='green', arrowstyle="->", connectionstyle="arc3,rad=.2"),
-                    )
+        # tempStr = "Pmax = "
+        # tempStr = tempStr + "%.3f" % (Puplim / 1000)
+        # tempStr = tempStr + "[kW]\n"
+        # tempStr = tempStr+ "When Q = %.0f [kVar]"% (Qpoint / 1000)
+        #
+        # ax.annotate(tempStr, xy=(Qpoint, Puplim), xytext=(Qpoint-3E6, Puplim + 0), color='g',
+        #             arrowprops=dict(facecolor='green', arrowstyle="->", connectionstyle="arc3,rad=.2"),
+        #             )
+        #
+        # tempStr = "Qmax = "
+        # tempStr = tempStr + "%.3f" % (Quplim / 1000)
+        # tempStr = tempStr + "[kVar]\n"
+        # tempStr = tempStr+ "When P = %.0f [kW]"% (Ppoint / 1000)
+        # ax.annotate(tempStr, xy=(Quplim, Ppoint), xytext=(Quplim + 0.2E6, 0), color='g',
+        #             arrowprops=dict(facecolor='green', arrowstyle="->", connectionstyle="arc3,rad=.2"),
+        #             )
 
         self.m_textQQQUUU.Value = ("%.3f" % (Quplim/1000))
         self.m_textQQQDDD.Value = ("%.3f" % (tempJWJX/1000))  #
@@ -861,7 +861,7 @@ class MyFrame(DF_CALCUL):
         ax.add_patch(poly)
         # ax.text(0, 30, r"$\int_a^b f(x)\mathrm{d}x$",
         #         horizontalalignment='center', fontsize=10)
-        ax.text(er / 2 + tempJWJX, er / 5, r"无功能力范围",
+        ax.text(er / 2 + tempJWJX, er / 5, r"有无功能力范围",
                 horizontalalignment='center', fontsize=16)
 
         #
@@ -880,16 +880,13 @@ class MyFrame(DF_CALCUL):
         plt.style.use('seaborn-paper')
         plt.grid(True)
         plt.axis("equal")
+        plt.tight_layout()
+        plt.savefig(outputFolderName + r"\fig_VarAbi.png", dpi=1000)
         if show == 1:
             plt.show()
 
-        plt.tight_layout()
-        plt.savefig(outputFolderName + r"\fig_VarAbi.png", dpi=1000)
-        plt.close()
 
-
-
-
+        plt.close('all')
 
     def Docu(self):
 
@@ -1010,9 +1007,9 @@ class MyFrame(DF_CALCUL):
         # print(dir(table_para))
         hdr_cells = table_para.columns[0].cells
 
-        self.m_Lksss.SetLabel(u"定子漏抗[ohm]")
-        self.m_Lkrrr.SetLabel(u"转子漏抗[ohm]")
-        self.m_staticText22.SetLabel(u"激磁电抗[ohm]")
+        # self.m_Lksss.SetLabel(u"定子漏抗[ohm]")
+        # self.m_Lkrrr.SetLabel(u"转子漏抗[ohm]")
+        # self.m_staticText22.SetLabel(u"激磁电抗[ohm]")
 
         hdr_cells[0].text = self.m_staticText22.GetLabel()
         hdr_cells[1].text = '定子电组[ohm]'
@@ -1117,6 +1114,53 @@ class MyFrame(DF_CALCUL):
         document.add_paragraph(
             '转子线电压最大值为： \t%8.3f [V],   %8.3f [V],   %8.3f [V]' % (max(iGenVrms100), max(iGenVrms90), max(iGenVrms110)))
         document.add_page_break()
+
+        ######## 能力边界
+        document.add_heading('有功、无功能力边界', level=1)
+        paragraph = document.add_paragraph()
+        paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+        run = paragraph.add_run("")
+        run.add_picture(r'.\fig_save\fig_VarAbi.png', width=Inches(5.25))
+
+        run = document.add_paragraph('图5. 有无功能力边界')
+        run.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+
+        document.add_paragraph('根据指定的无功功率值，计算有功最大值。')
+
+        tempStr = "Pmax = "
+        tempStr = tempStr + "%.3f" % (Pmax / 1000)
+        tempStr = tempStr + "[kW]  \n"
+        tempStr = tempStr+ "Ppoint_max = "
+        tempStr = tempStr + "%.3f" % (Puplim / 1000)
+        tempStr = tempStr + "[kW]  \t"
+        tempStr = tempStr+ "When Qpoint = %.0f [kVar]"% (Qpoint / 1000)
+        document.add_paragraph(tempStr)
+
+        document.add_paragraph('根据指定的有功功率值，计算无功最大值。')
+        tempStr = "Qmax = "
+        tempStr = tempStr + "%.3f" % (Qmax / 1000)
+        tempStr = tempStr + "[kVar]\n"
+        tempStr = tempStr +"Qpoint_max = "
+        tempStr = tempStr + "%.3f" % (Quplim / 1000)
+        tempStr = tempStr + "[kVar]\t"
+        tempStr = tempStr+ "When Ppoint = %.0f [kW]"% (Ppoint / 1000)
+        document.add_paragraph(tempStr)
+
+        #document.add_paragraph()
+        document.add_page_break()
+
+
+
+        #
+        # ax.annotate(tempStr, xy=(Qpoint, Puplim), xytext=(Qpoint-3E6, Puplim + 0), color='g',
+        #             arrowprops=dict(facecolor='green', arrowstyle="->", connectionstyle="arc3,rad=.2"),
+        #             )
+        #
+        # tempStr = "Qmax = "
+        # tempStr = tempStr + "%.3f" % (Quplim / 1000)
+        # tempStr = tempStr + "[kVar]\n"
+        # tempStr = tempStr+ "When P = %.0f [kW]"% (Ppoint / 1000)
+        # ax.annotate(tempStr, xy=(Quplim, Ppoint), xytext=(Quplim + 0.2E6, 0), color='g',
 
         ########结论
         document.add_heading('结论', level=1)
