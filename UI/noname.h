@@ -25,6 +25,7 @@
 #include <wx/image.h>
 #include <wx/icon.h>
 #include <wx/button.h>
+#include <wx/menu.h>
 #include <wx/frame.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -79,9 +80,19 @@ class DF_CALCUL : public wxFrame
 		wxStaticText* m_staticText171;
 		wxButton* m_button;
 		wxButton* m_button2;
-		wxStaticText* m_staticText201;
-		wxStaticText* m_staticText251;
-		wxStaticText* m_staticText2511;
+		wxTextCtrl* m_textPPP;
+		wxTextCtrl* m_textQQQUUU;
+		wxTextCtrl* m_textQQQDDD;
+		wxStaticText* m_staticText1712;
+		wxStaticText* m_staticText17122;
+		wxStaticText* m_staticText171221;
+		wxTextCtrl* m_textQQQ;
+		wxTextCtrl* m_textPPPUUU;
+		wxTextCtrl* m_textPPPDDD;
+		wxStaticText* m_staticText17121;
+		wxStaticText* m_staticText171211;
+		wxStaticText* m_staticText171212;
+		wxButton* m_button1;
 		wxStaticText* m_staticText16;
 		wxScrolledWindow* m_scrolledWindow1;
 		wxStaticText* m_staticText311;
@@ -130,16 +141,21 @@ class DF_CALCUL : public wxFrame
 		wxTextCtrl* m_GenVrms;
 		wxStaticText* m_staticText40;
 		wxTextCtrl* m_Torque;
+		wxMenuBar* m_menubar1;
+		wxMenu* m_menu5;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnCheck( wxCommandEvent& event ) { event.Skip(); }
 		virtual void m_buttonOnButtonClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void m_buttonOnButtonClick2( wxCommandEvent& event ) { event.Skip(); }
+		virtual void m_buttonOnButtonClick3( wxCommandEvent& event ) { event.Skip(); }
+		virtual void mOnMenuSelection2( wxCommandEvent& event ) { event.Skip(); }
+		virtual void mOnMenuSelection1( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
-		DF_CALCUL( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("双馈风电机组电驱系统设计工具"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 1300,650 ), long style = wxCAPTION|wxCLOSE_BOX|wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		DF_CALCUL( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("双馈风电机组电驱系统设计工具"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 1350,650 ), long style = wxCAPTION|wxCLOSE_BOX|wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 		
 		~DF_CALCUL();
 	

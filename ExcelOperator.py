@@ -8,6 +8,7 @@ import datetime
 import os
 import sys
 import matplotlib.pyplot as plt
+from matplotlib.pyplot import Polygon
 import wx
 import wx.xrc
 import math
@@ -25,6 +26,8 @@ from pptx.util import Inches, Pt
 
 myChecked = False
 NetFreq = 50
+Root2 = 1.414
+Root3 = 1.732
 
 ''' 函数：返回变量是否被定义过 '''
 
@@ -36,6 +39,10 @@ def isset(v):
         return 0
     else:
         return 1
+
+
+def func_cycle(x, e, x_o, y_o):
+    return np.sqrt((e ** 2 - (x - x_o) ** 2)) + y_o
 
 
 class MyFrame(DF_CALCUL):
@@ -61,7 +68,9 @@ class MyFrame(DF_CALCUL):
         self.m_staticText15.SetFont(font1)
         self.m_button.SetFont(font1)
         self.m_button2.SetFont(font1)
+        self.m_button1.SetFont(font1)
         self.m_staticText16.SetFont(font1)
+
         self.m_grid2.SetRowLabelValue(0, '转速[RPM]')  # ???
         self.m_grid2.SetRowLabelValue(1, '上网功率[kW]')  # ???
         # ctrl - c
@@ -118,6 +127,7 @@ class MyFrame(DF_CALCUL):
     def m_buttonOnButtonClick(self, event):
         print("press button1")
         self.DoWork(1)
+        # self.Plot_Var_Abili(1)
         self.PlotAll()
 
     def m_buttonOnButtonClick2(self, event):
@@ -126,7 +136,7 @@ class MyFrame(DF_CALCUL):
         self.Plot1()
         self.Plot2()
         self.Plot3()
-
+        self.Plot_Var_Abili(0)
         ###################################################################报错
         # self.Docu()
         # self.statusbar.SetStatusText('Report Generate at , %s ' % wx.Now())
@@ -150,6 +160,29 @@ class MyFrame(DF_CALCUL):
                 self.Close(True)
             dlg.Destroy()
 
+
+    def m_buttonOnButtonClick3(self, event):
+        print("press button3")          # 无功边界
+        self.DoWork(1)
+
+        self.Plot_Var_Abili(1)
+
+
+
+    def mOnMenuSelection2(self, event):
+        dlg = wx.MessageDialog(None,
+                               "备注1：dq变换为等幅值形式；\n备注2：“归算值”表示电机数学模型中将转子侧参数统一折算到定子侧，与Matlab仿真模型计算值相同； “实际值”表示反折算过程，与实际系统的测量值相同；\n备注3：Lm(互感)      = Xm(激磁电抗or磁化电抗) / (2pi*f)    其中 f为电网频率。定子漏感，转子漏感计算方式相同。",
+                               u"确认", wx.YES_DEFAULT | wx.ICON_QUESTION)
+        if dlg.ShowModal() == wx.ID_YES:
+            self.Close(True)
+        dlg.Destroy()
+
+    def mOnMenuSelection1(self, event):
+        dlg = wx.MessageDialog(None, u"版本:V1.3", u"确认", wx.YES_DEFAULT | wx.ICON_QUESTION)
+        if dlg.ShowModal() == wx.ID_YES:
+            self.Close(True)
+        dlg.Destroy()
+
     def m_slider1OnScrollChanged(self, event):
         pass
         # temp = float(self.m_slider1.GetValue())
@@ -157,8 +190,7 @@ class MyFrame(DF_CALCUL):
 
     def DoWork(self, netVotGain):
 
-        Root2 = 1.414
-        Root3 = 1.732
+
         plt.close('all')
         # slider input part
         # tempMin = float(self.m_textCtrlS1.GetValue())
@@ -169,8 +201,8 @@ class MyFrame(DF_CALCUL):
         # print(self.m_slider1.Value)
 
         # input part
-        global pp, NetFreq, TongBuZhuanSu, StatorRePower, RotorOpenVoltage, GenRpm, XiaoLv
-        global Xm, Xs, Xr, Rs, Rr
+        global pp, NetFreq, TongBuZhuanSu, StatorRePower, RotorOpenVoltage, GenRpm, XiaoLv, GridVRMS
+        global Xm, Xs, Xr, Rs, Rr, G2, Xm__Xss
 
         pp = float(self.m_pp.GetValue())  # pp
         A2 = pp
@@ -378,17 +410,18 @@ class MyFrame(DF_CALCUL):
             iS2[i] = iRotorAPower[i]
             iRotorVoltRMS[i] = RotorOpenVoltage * iZhuanChaLv[i]  # 转子电压有效值
             iT2[i] = iRotorVoltRMS[i]
-            #########################################################################
-            iGenId[i] = iR2[i] / 1.5 / (L2 / (L2 + J2) * G2)
+            #########################################################################  转子（机侧）电流
+            iGenId[i] = iR2[i] / 1.5 / (L2 / (L2 + J2) * G2)  # J2为定子漏感
             iU2 = iGenId
-            iGenIq[i] = (D2 / 1.5 - G2 ** 2 / (L2 + J2) / 2 / 3.14 / N2) / (L2 * G2 / (L2 + J2))
+            iGenIq[i] = (D2 / 1.5 - G2 ** 2 / (L2 + J2) / 2 / pi / N2) / (L2 * G2 / (L2 + J2))
             iV2[i] = iGenIq[i]
 
             iGenIrmsGS[i] = (iU2[i] ** 2 + iV2[i] ** 2) ** 0.5 / 1.414
             iAD2[i] = iGenIrmsGS[i]
             iGenIrmsSJ[i] = iAD2[i] * F2 / E2
             iAE2[i] = iGenIrmsSJ[i]
-            #########################################################################
+
+            #########################################################################  定子电流，网侧电流
             iStatorId[i] = -iR2[i] / 1.5 / G2
             iX2[i] = iStatorId[i]
             iStatorIq[i] = -D2 / 1.5 / G2
@@ -397,7 +430,20 @@ class MyFrame(DF_CALCUL):
             iY2[i] = iStatorIrms[i]
             iNetIrms[i] = 1 / M2 * iS2[i] / 1.732 / F2
             iAF2[i] = iNetIrms[i]
-            #########################################################################
+
+            #########################################################################  测试
+            Xm__Xss = L2 / (L2 + J2)
+            watchPaper = iStatorIq[i] / iGenIq[i] / Xm__Xss
+
+            print('Xm__Xss = %s' % Xm__Xss)
+            print('Ids = %s' % iStatorIq[i])
+            print('IdrB = %s' % (iGenIq[i] * Xm__Xss))
+
+            temp = G2 / (Xm + Xs)
+            print('watchPaper2 = %s' % temp)
+            print('G2 = %s' % G2)
+
+            #########################################################################  电压
             iGenVd[i] = Rr * iGenId[i] - iZhuanChaLv[i] * (NetFreq * 2 * pi) * (
                     Lm * (iStatorIq[i]) + (Lkr + Lm) * iGenIq[i])
             iZ2[i] = iGenVd[i]
@@ -682,6 +728,169 @@ class MyFrame(DF_CALCUL):
         plt.savefig(outputFolderName + r"\fig_Current.png", dpi=1000)
         plt.close(3)
 
+    def Plot_Var_Abili(self, show):  # 阴影
+        font = {'family': 'SimHei',
+                'weight': 'bold',
+                'size': '10'}
+        plt.rc('font', **font)  # 步骤一（设置字体的更多属性）
+        plt.rc('axes', unicode_minus=False)  # 步骤二（解决坐标轴负数的负号显示问题）
+
+        fig, ax = plt.subplots()  # 无功图
+
+        """:type:HTTPResponse"""
+
+
+        Ppoint = float(self.m_textPPP.GetValue()) * 1000
+        Qpoint = float(self.m_textQQQ.GetValue()) * 1000
+
+        global es,er,tempJWJX,data, Pmax,Qmax,Puplim,Quplim
+
+        xss = Xs + Xm  # 定子电抗
+        print("xss = %.3f" % xss)
+        # tempJWJX = -Us**2 / xss (G2 为相电压峰值)
+        tempJWJX = -3 * ((G2 / 1.414) ** 2) / xss  # Q = 3 * Urms * Urms / R
+
+        es = 3 * G2 / 1.414 * float(self.m_SetSatMaxI.GetValue())  # 定子电流极限圆半径
+        er = 3 * G2 / 1.414 * (
+                    float(self.m_SetGenCurMax1.GetValue()) * RotorOpenVoltage / GridVRMS) * Xm__Xss  # 转子电流极限圆半径
+        print("es = %.3f" % es)
+        print("er = %.3f" % er)
+
+        #输入无功求有功最大值
+        Puplim = min(np.sqrt(es**2 - Qpoint**2),np.sqrt(er**2 - (Qpoint-tempJWJX)**2))
+        # 输入有功求无功最大值
+        Quplim = min(np.sqrt(es**2 - Ppoint**2),np.sqrt(er**2 - Ppoint**2)+tempJWJX)
+
+        print("PQUP = ")
+        print(Puplim,Quplim)
+
+
+
+        # x轴
+        x = np.linspace(-max(es, er) - abs(tempJWJX) - 0, max(es, er) + abs(tempJWJX) + 0, 20000)  # x 轴范围
+
+        ys = func_cycle(x, es, 0, 0)
+        yr = func_cycle(x, er, tempJWJX, 0)
+
+        liney = np.linspace(0, er, 200)
+        linex = ref = np.ones(200) * tempJWJX
+
+        ax.plot(x, ys, color="red", linewidth=1.5, linestyle="-.", label="定子电流极限")
+        ax.plot(x, yr, color="blue", linewidth=1.5, linestyle="-.", label="转子电流极限")
+        ax.plot(linex, liney, color="green", linewidth=1.5, linestyle="-.", label="静态稳定极限")
+        tempStr = "Qmin = "
+        tempStr = tempStr + "%.3f" % (tempJWJX / 1000)
+        tempStr = tempStr + "[kVar]"
+
+        ax.annotate(tempStr, xy=(tempJWJX, 0 + er * 0.8), xytext=(tempJWJX * 5, -tempJWJX / 2 + er), color='g',
+                    arrowprops=dict(facecolor='green', arrowstyle="->", connectionstyle="arc3,rad=.2"),
+                    )
+
+        tempStr = "Pmax = "
+        tempStr = tempStr + "%.3f" % (Puplim / 1000)
+        tempStr = tempStr + "[kW]\n"
+        tempStr = tempStr+ "When Q = %.0f [kVar]"% (Qpoint / 1000)
+
+        ax.annotate(tempStr, xy=(Qpoint, Puplim), xytext=(Qpoint - 1100000, Puplim - 200000), color='g',
+                    arrowprops=dict(facecolor='green', arrowstyle="->", connectionstyle="arc3,rad=.2"),
+                    )
+
+        tempStr = "Qmax = "
+        tempStr = tempStr + "%.3f" % (Quplim / 1000)
+        tempStr = tempStr + "[kVar]\n"
+        tempStr = tempStr+ "When P = %.0f [kW]"% (Ppoint / 1000)
+        ax.annotate(tempStr, xy=(Quplim, Ppoint), xytext=(Quplim - 1900000, Ppoint - 200000), color='g',
+                    arrowprops=dict(facecolor='green', arrowstyle="->", connectionstyle="arc3,rad=.2"),
+                    )
+
+        self.m_textQQQUUU.Value = ("%.3f" % (Quplim/1000))
+        self.m_textQQQDDD.Value = ("%.3f" % (tempJWJX/1000))  #
+
+        self.m_textPPPUUU.Value = ("%.3f" % (Puplim/1000))
+        self.m_textPPPDDD.Value = ("%.3f" % 0)                #
+
+        plt.legend()
+        ##########################################################
+
+        # 显示x y
+        font = {'family': 'SimHei',
+                'weight': 'bold',
+                'size': '16'}
+        plt.rc('font', **font)  # 步骤一（设置字体的更多属性）
+        plt.rc('axes', unicode_minus=False)  # 步骤二（解决坐标轴负数的负号显示问题）
+        plt.figtext(0.9, 0.03, '$Q$')
+        plt.figtext(0.1, 0.9, '$P$')
+        font = {'family': 'SimHei',
+                'weight': 'bold',
+                'size': '10'}
+        plt.rc('font', **font)  # 步骤一（设置字体的更多属性）
+        plt.rc('axes', unicode_minus=False)  # 步骤二（解决坐标轴负数的负号显示问题）
+
+        # 设置x轴上的显示
+
+        ixy = []
+        Pmax = 0
+        Qmax = 0
+        # 将x y转为坐标对
+        for i in range(len(x)):
+            if (np.isnan(ys[i])) or (np.isnan(yr[i])):
+                pass
+            else:
+                if x[i] > tempJWJX:
+                    ixy.append([x[i], min(ys[i], yr[i])])
+                    Pmax = max(Pmax, min(ys[i], yr[i]))
+                    Qmax = max(Qmax, x[i])
+
+        # ixy = zip(ix, iy)
+
+        # 生成阴影区域的坐标对
+        data = ixy
+        print(data[0])
+        data[0][0] = tempJWJX
+        data[0][1] = 0
+
+        data.append([min((er + tempJWJX), es), 0])
+
+
+        # 寻找data列表Y值最高点。
+
+
+        # 生成阴影部分 其实是多边形
+        poly = Polygon(data, facecolor='0.9', edgecolor='0.1', label="定子电流极限")
+
+        ax.add_patch(poly)
+        # ax.text(0, 30, r"$\int_a^b f(x)\mathrm{d}x$",
+        #         horizontalalignment='center', fontsize=10)
+        ax.text(er / 2 + tempJWJX, er / 5, r"无功能力范围",
+                horizontalalignment='center', fontsize=16)
+
+        #
+        # # 显示函数
+        # x_math = (a + b) / 2
+        # y_math = 50
+        #
+        # # horizontalalignment水平对齐
+        # plt.text(x_math, y_math, r'$-(x-2)*(x+3)+70$', fontsize=10, horizontalalignment='center')
+        #
+        # 使用显示风格
+
+        ax.set_xlabel('定子输出无功功率[Var]')
+        ax.set_ylabel('定子输出有功功率[W]')
+
+        plt.style.use('seaborn-paper')
+        plt.grid(True)
+        plt.axis("equal")
+        if show == 1:
+            plt.show()
+
+        plt.tight_layout()
+        plt.savefig(outputFolderName + r"\fig_VarAbi.png", dpi=1000)
+        plt.close()
+
+
+
+
+
     def Docu(self):
 
         '''save %0 data'''
@@ -944,18 +1153,16 @@ class MyFrame(DF_CALCUL):
         para_cells2 = table_para.columns[2].cells
         para_cells2[0].text = '是否通过'
 
-        #1,2,3,4行
+        # 1,2,3,4行
         for i in range(4):
             p = para_cells2[i + 1].paragraphs.pop()
-            #print(dir(para_cells2[i + 1].paragraphs))
-            #print(dir(p.style))
-            #print(len(p))
-            #p.style.font.color.rgb = RGBColor(250, 0, 0)
+            # print(dir(para_cells2[i + 1].paragraphs))
+            # print(dir(p.style))
+            # print(len(p))
+            # p.style.font.color.rgb = RGBColor(250, 0, 0)
             run = p.add_run(str(TF[i]))
             if TF[i] is False:
                 run.font.color.rgb = RGBColor(250, 0, 0)
-
-
 
         document.add_paragraph(r'')
 
