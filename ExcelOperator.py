@@ -212,8 +212,8 @@ class MyFrame(DF_CALCUL):
         TongBuZhuanSu = 60 * NetFreq / pp  # 同步转速
         B2 = TongBuZhuanSu
 
-        # GoNetPower = float(self.m_GoNetPower.GetValue()) * 1E3  # 上网总功率
-        # C2 = GoNetPower
+        GoNetPower = float(self.m_GoNetPower.GetValue()) * 1E3  # 变流器容量
+        C2 = GoNetPower
         StatorRePower = float(self.m_StatorRePower.GetValue()) * 1E3  # 定子无功
         D2 = StatorRePower
         RotorOpenVoltage = float(self.m_RotorOpen.GetValue())  # 转子开口电压
@@ -399,11 +399,20 @@ class MyFrame(DF_CALCUL):
         global iGridrms
         iGridrms = [0 for i in range(n)]
 
+        global iNetMaxVar
+        iNetMaxVar = [0 for i in range(n)]
+
         for i in range(n):
             if iGenRpm[i] == TongBuZhuanSu:
                 iGenRpm[i] = iGenRpm[i] + 1
+
+
             iZhuanChaLv[i] = (TongBuZhuanSu - iGenRpm[i]) / TongBuZhuanSu  # 转差率
             iQ2[i] = iZhuanChaLv[i]
+
+            iNetMaxVar[i] = np.sqrt(GoNetPower**2 - ((iZhuanChaLv[i]/(1-iZhuanChaLv[i]))*iGoNetPower[i])**2)
+
+            print(GoNetPower,iGoNetPower[i])
             iStatorAPower[i] = iGoNetPower[i] / (1 - iZhuanChaLv[i])  # 定子有功
             iR2[i] = iStatorAPower[i]
             iRotorAPower[i] = iStatorAPower[i] * iZhuanChaLv[i]  # 转子有功
@@ -463,6 +472,7 @@ class MyFrame(DF_CALCUL):
             iTotalAPower[i] = iStatorAPower[i] + iRotorAPower[i]
             iGridrms[i] = abs(iNetIrms[i]) + abs(iStatorIrms[i])
 
+
         # output part
         print('Torque = %f' % iTorque[-1])
         print('iU2 %f' % iU2[-1])
@@ -497,6 +507,10 @@ class MyFrame(DF_CALCUL):
         self.m_GenV.Value = ("%.3f" % iGenV[-1])  #
         self.m_GenVrms.Value = ("%.3f" % iGenVrms[-1])  #
         self.m_Torque.Value = ("%.3f" % iTorque[-1])  #
+
+        self.m_Var1.Value = ("%.3f" % (iNetMaxVar[-1]/1000))
+        print("------------")
+        print(iNetMaxVar[-1]/1000)
 
         ######################################################################################
 
@@ -861,8 +875,22 @@ class MyFrame(DF_CALCUL):
         ax.add_patch(poly)
         # ax.text(0, 30, r"$\int_a^b f(x)\mathrm{d}x$",
         #         horizontalalignment='center', fontsize=10)
-        ax.text(er / 2 + tempJWJX, er / 5, r"有无功能力范围",
+        ax.text(er / 2 + tempJWJX, er / 5, r"定子有无功能力范围",
                 horizontalalignment='center', fontsize=16)
+
+        Pmax2 = data
+        Qmax2 = data
+
+        Qmax2 = (sorted(ixy, key=lambda x: x[0]))[-1]
+        Pmax2 = (sorted(ixy, key=lambda x: x[1]))[-1]
+
+
+        ax.annotate('Pmax = %.1f'%Pmax2[1], xy=Pmax2, xytext= np.sum([Pmax2,[0,-5E5]],axis=0), color='g',
+                    arrowprops=dict(facecolor='green', arrowstyle="->", connectionstyle="arc3,rad=.2"),
+                    )
+        ax.annotate('Qmax = %.1f'%Qmax2[0], xy=Qmax2, xytext=np.sum([Qmax2,[-1E6,-3E5]],axis=0), color='g',
+                    arrowprops=dict(facecolor='green', arrowstyle="->", connectionstyle="arc3,rad=.2"),
+                    )
 
         #
         # # 显示函数
@@ -975,8 +1003,8 @@ class MyFrame(DF_CALCUL):
         # print(dir(table_para))
         hdr_cells = table_para.columns[0].cells
 
-        hdr_cells[0].text = '极对数'
-        hdr_cells[1].text = '上网总功率[kW]'
+        hdr_cells[0].text = ''
+        hdr_cells[1].text = '极对数'
         hdr_cells[2].text = '转子开口电压[Vrms]'
         hdr_cells[3].text = '电网电压[Vrms]'
         hdr_cells[4].text = '电网频率[Hz]'
@@ -986,11 +1014,11 @@ class MyFrame(DF_CALCUL):
         hdr_cells[8].text = '网侧变流器最大电流[A]'
         hdr_cells[9].text = '机侧变流器最大电流[A]'
         hdr_cells[10].text = '发电机定子最大电流[A]'
-        hdr_cells[11].text = ' '
+        hdr_cells[11].text = '变流器容量[kW]'
 
         para_cells = table_para.columns[1].cells
-        para_cells[0].text = self.m_pp.GetValue()
-        para_cells[1].text = self.m_GoNetPower.GetValue()
+        para_cells[0].text = ''
+        para_cells[1].text = self.m_pp.GetValue()
         para_cells[2].text = self.m_RotorOpen.GetValue()
         para_cells[3].text = self.m_GridVRMS.GetValue()
         para_cells[4].text = self.m_hz.GetValue()
@@ -1000,7 +1028,7 @@ class MyFrame(DF_CALCUL):
         para_cells[8].text = self.m_SetNetCurMax.GetValue()
         para_cells[9].text = self.m_SetGenCurMax1.GetValue()
         para_cells[10].text = self.m_SetSatMaxI.GetValue()
-        para_cells[11].text = ' '
+        para_cells[11].text = self.m_GoNetPower.GetValue()
 
         ###################电机表######################
         table_para = document.add_table(rows=5, cols=2)
@@ -1122,10 +1150,10 @@ class MyFrame(DF_CALCUL):
         run = paragraph.add_run("")
         run.add_picture(r'.\fig_save\fig_VarAbi.png', width=Inches(5.25))
 
-        run = document.add_paragraph('图5. 有无功能力边界')
+        run = document.add_paragraph('图5. 定子有无功能力边界')
         run.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
 
-        document.add_paragraph('根据指定的无功功率值，计算有功最大值。')
+        document.add_paragraph('根据指定的定子无功功率值，计算有功输出最大值。')
 
         tempStr = "Pmax = "
         tempStr = tempStr + "%.3f" % (Pmax / 1000)
@@ -1136,7 +1164,7 @@ class MyFrame(DF_CALCUL):
         tempStr = tempStr+ "When Qpoint = %.0f [kVar]"% (Qpoint / 1000)
         document.add_paragraph(tempStr)
 
-        document.add_paragraph('根据指定的有功功率值，计算无功最大值。')
+        document.add_paragraph('根据指定的定子有功功率值，计算无功输出最大值。')
         tempStr = "Qmax = "
         tempStr = tempStr + "%.3f" % (Qmax / 1000)
         tempStr = tempStr + "[kVar]\n"

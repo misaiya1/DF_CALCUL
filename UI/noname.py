@@ -18,7 +18,7 @@ import wx.grid
 class DF_CALCUL ( wx.Frame ):
 	
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"双馈风电机组电驱系统设计工具", pos = wx.DefaultPosition, size = wx.Size( 1350,650 ), style = wx.CAPTION|wx.CLOSE_BOX|wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"双馈风电机组电驱系统设计工具", pos = wx.DefaultPosition, size = wx.Size( 1350,600 ), style = wx.CAPTION|wx.CLOSE_BOX|wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 		
 		self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 		
@@ -56,14 +56,6 @@ class DF_CALCUL ( wx.Frame ):
 		
 		self.m_hz = wx.TextCtrl( self.m_scrolledWindow2, wx.ID_ANY, u"50", wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer3.Add( self.m_hz, 0, wx.ALL, 5 )
-		
-		self.m_Tgonet = wx.StaticText( self.m_scrolledWindow2, wx.ID_ANY, u"上网总功率[kW]", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_Tgonet.Wrap( -1 )
-		
-		fgSizer3.Add( self.m_Tgonet, 0, wx.ALL, 5 )
-		
-		self.m_GoNetPower = wx.TextCtrl( self.m_scrolledWindow2, wx.ID_ANY, u"3450", wx.DefaultPosition, wx.DefaultSize, 0 )
-		fgSizer3.Add( self.m_GoNetPower, 0, wx.ALL, 5 )
 		
 		self.m_TstPower = wx.StaticText( self.m_scrolledWindow2, wx.ID_ANY, u"定子无功功率[kW]", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_TstPower.Wrap( -1 )
@@ -128,6 +120,14 @@ class DF_CALCUL ( wx.Frame ):
 		
 		self.m_SetSatMaxI = wx.TextCtrl( self.m_scrolledWindow2, wx.ID_ANY, u"1503", wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer3.Add( self.m_SetSatMaxI, 0, wx.ALL, 5 )
+		
+		self.m_Tgonet = wx.StaticText( self.m_scrolledWindow2, wx.ID_ANY, u"(选填)变流器容量[kW]", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_Tgonet.Wrap( -1 )
+		
+		fgSizer3.Add( self.m_Tgonet, 0, wx.ALL, 5 )
+		
+		self.m_GoNetPower = wx.TextCtrl( self.m_scrolledWindow2, wx.ID_ANY, u"3450", wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer3.Add( self.m_GoNetPower, 0, wx.ALL, 5 )
 		
 		
 		self.m_scrolledWindow2.SetSizer( fgSizer3 )
@@ -247,90 +247,105 @@ class DF_CALCUL ( wx.Frame ):
 		
 		bSlideButtZone = wx.BoxSizer( wx.VERTICAL )
 		
-		gSizer2 = wx.GridSizer( 0, 2, 0, 0 )
+		gSizer2 = wx.GridSizer( 2, 0, 0, 0 )
 		
-		bSizer11 = wx.BoxSizer( wx.VERTICAL )
-		
-		self.m_textCtrlS = wx.TextCtrl( self, wx.ID_ANY, u"1725", wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer11.Add( self.m_textCtrlS, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
-		
-		self.m_staticText171 = wx.StaticText( self, wx.ID_ANY, u"右侧计算使用的转速点[RPM]", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER_HORIZONTAL )
-		self.m_staticText171.Wrap( -1 )
-		
-		bSizer11.Add( self.m_staticText171, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
-		
-		self.m_button = wx.Button( self, wx.ID_ANY, u"重新单点计算", wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer11.Add( self.m_button, 0, wx.ALL|wx.EXPAND, 5 )
-		
-		self.m_button2 = wx.Button( self, wx.ID_ANY, u"报告生成", wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer11.Add( self.m_button2, 0, wx.ALL|wx.EXPAND, 5 )
-		
-		
-		gSizer2.Add( bSizer11, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
-		
-		bSizer12 = wx.BoxSizer( wx.VERTICAL )
+		self.m_scrolledWindow3 = wx.ScrolledWindow( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.HSCROLL|wx.VSCROLL )
+		self.m_scrolledWindow3.SetScrollRate( 5, 5 )
+		bSizer14 = wx.BoxSizer( wx.VERTICAL )
 		
 		gSizer31 = wx.GridSizer( 0, 3, 0, 0 )
 		
-		self.m_textPPP = wx.TextCtrl( self, wx.ID_ANY, u"1000", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_textPPP = wx.TextCtrl( self.m_scrolledWindow3, wx.ID_ANY, u"1000", wx.DefaultPosition, wx.DefaultSize, 0 )
 		gSizer31.Add( self.m_textPPP, 0, wx.ALL, 5 )
 		
-		self.m_textQQQUUU = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_textQQQUUU = wx.TextCtrl( self.m_scrolledWindow3, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
 		gSizer31.Add( self.m_textQQQUUU, 0, wx.ALL, 5 )
 		
-		self.m_textQQQDDD = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_textQQQDDD = wx.TextCtrl( self.m_scrolledWindow3, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
 		gSizer31.Add( self.m_textQQQDDD, 0, wx.ALL, 5 )
 		
-		self.m_staticText1712 = wx.StaticText( self, wx.ID_ANY, u"输入P[kW]", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER_HORIZONTAL )
+		self.m_staticText1712 = wx.StaticText( self.m_scrolledWindow3, wx.ID_ANY, u"输入P[kW]", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER_HORIZONTAL )
 		self.m_staticText1712.Wrap( -1 )
 		
 		gSizer31.Add( self.m_staticText1712, 0, wx.ALL, 5 )
 		
-		self.m_staticText17122 = wx.StaticText( self, wx.ID_ANY, u"无功上限", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER_HORIZONTAL )
+		self.m_staticText17122 = wx.StaticText( self.m_scrolledWindow3, wx.ID_ANY, u"定子无功上限", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER_HORIZONTAL )
 		self.m_staticText17122.Wrap( -1 )
 		
 		gSizer31.Add( self.m_staticText17122, 0, wx.ALL, 5 )
 		
-		self.m_staticText171221 = wx.StaticText( self, wx.ID_ANY, u"无功下限", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER_HORIZONTAL )
+		self.m_staticText171221 = wx.StaticText( self.m_scrolledWindow3, wx.ID_ANY, u"定子无功下限", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER_HORIZONTAL )
 		self.m_staticText171221.Wrap( -1 )
 		
 		gSizer31.Add( self.m_staticText171221, 0, wx.ALL, 5 )
 		
-		self.m_textQQQ = wx.TextCtrl( self, wx.ID_ANY, u"1000", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_textQQQ = wx.TextCtrl( self.m_scrolledWindow3, wx.ID_ANY, u"1000", wx.DefaultPosition, wx.DefaultSize, 0 )
 		gSizer31.Add( self.m_textQQQ, 0, wx.ALL, 5 )
 		
-		self.m_textPPPUUU = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_textPPPUUU = wx.TextCtrl( self.m_scrolledWindow3, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
 		gSizer31.Add( self.m_textPPPUUU, 0, wx.ALL, 5 )
 		
-		self.m_textPPPDDD = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_textPPPDDD = wx.TextCtrl( self.m_scrolledWindow3, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
 		gSizer31.Add( self.m_textPPPDDD, 0, wx.ALL, 5 )
 		
-		self.m_staticText17121 = wx.StaticText( self, wx.ID_ANY, u"输入Q[kVar]", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER_HORIZONTAL )
+		self.m_staticText17121 = wx.StaticText( self.m_scrolledWindow3, wx.ID_ANY, u"输入Q[kVar]", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER_HORIZONTAL )
 		self.m_staticText17121.Wrap( -1 )
 		
 		gSizer31.Add( self.m_staticText17121, 0, wx.ALL, 5 )
 		
-		self.m_staticText171211 = wx.StaticText( self, wx.ID_ANY, u"有功上限", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER_HORIZONTAL )
+		self.m_staticText171211 = wx.StaticText( self.m_scrolledWindow3, wx.ID_ANY, u"定子有功上限", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER_HORIZONTAL )
 		self.m_staticText171211.Wrap( -1 )
 		
 		gSizer31.Add( self.m_staticText171211, 0, wx.ALL, 5 )
 		
-		self.m_staticText171212 = wx.StaticText( self, wx.ID_ANY, u"有功下限", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER_HORIZONTAL )
+		self.m_staticText171212 = wx.StaticText( self.m_scrolledWindow3, wx.ID_ANY, u"定子有功下限", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER_HORIZONTAL )
 		self.m_staticText171212.Wrap( -1 )
 		
 		gSizer31.Add( self.m_staticText171212, 0, wx.ALL, 5 )
 		
 		
-		bSizer12.Add( gSizer31, 1, wx.EXPAND, 5 )
+		bSizer14.Add( gSizer31, 1, wx.EXPAND, 5 )
+		
+		
+		self.m_scrolledWindow3.SetSizer( bSizer14 )
+		self.m_scrolledWindow3.Layout()
+		bSizer14.Fit( self.m_scrolledWindow3 )
+		gSizer2.Add( self.m_scrolledWindow3, 1, wx.EXPAND |wx.ALL, 5 )
+		
+		bSizer11 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		gSizer5 = wx.GridSizer( 2, 2, 0, 0 )
+		
+		bSizer134 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_textCtrlS = wx.TextCtrl( self, wx.ID_ANY, u"1725", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer134.Add( self.m_textCtrlS, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
+		
+		self.m_staticText171 = wx.StaticText( self, wx.ID_ANY, u"右侧计算使用的转速点[RPM]", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER_HORIZONTAL )
+		self.m_staticText171.Wrap( -1 )
+		
+		bSizer134.Add( self.m_staticText171, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
+		
+		
+		gSizer5.Add( bSizer134, 1, wx.EXPAND, 5 )
+		
+		self.m_button = wx.Button( self, wx.ID_ANY, u"重新单点计算", wx.DefaultPosition, wx.DefaultSize, 0 )
+		gSizer5.Add( self.m_button, 1, wx.ALL|wx.EXPAND, 5 )
 		
 		self.m_button1 = wx.Button( self, wx.ID_ANY, u"有无功能力边界计算", wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer12.Add( self.m_button1, 0, wx.ALL, 5 )
+		gSizer5.Add( self.m_button1, 1, wx.ALL|wx.EXPAND, 5 )
+		
+		self.m_button2 = wx.Button( self, wx.ID_ANY, u"报告生成", wx.DefaultPosition, wx.DefaultSize, 0 )
+		gSizer5.Add( self.m_button2, 1, wx.ALL|wx.EXPAND, 5 )
 		
 		
-		gSizer2.Add( bSizer12, 1, wx.EXPAND|wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
+		bSizer11.Add( gSizer5, 1, wx.EXPAND, 5 )
 		
 		
-		bSlideButtZone.Add( gSizer2, 0, wx.EXPAND, 5 )
+		gSizer2.Add( bSizer11, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
+		
+		
+		bSlideButtZone.Add( gSizer2, 1, wx.EXPAND, 5 )
 		
 		
 		bSizer5.Add( bSlideButtZone, 0, wx.EXPAND, 5 )
@@ -547,6 +562,24 @@ class DF_CALCUL ( wx.Frame ):
 		self.m_Torque = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer4.Add( self.m_Torque, 0, wx.ALL, 5 )
 		
+		self.m_staticText441 = wx.StaticText( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText441.Wrap( -1 )
+		
+		fgSizer4.Add( self.m_staticText441, 0, wx.ALL, 5 )
+		
+		self.m_staticText442 = wx.StaticText( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText442.Wrap( -1 )
+		
+		fgSizer4.Add( self.m_staticText442, 0, wx.ALL, 5 )
+		
+		self.m_staticText402 = wx.StaticText( self.m_scrolledWindow1, wx.ID_ANY, u"网侧无功功率最大值[kVar]", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText402.Wrap( -1 )
+		
+		fgSizer4.Add( self.m_staticText402, 0, wx.ALL, 5 )
+		
+		self.m_Var1 = wx.TextCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer4.Add( self.m_Var1, 0, wx.ALL, 5 )
+		
 		
 		bSizer71.Add( fgSizer4, 1, wx.EXPAND, 5 )
 		
@@ -580,8 +613,8 @@ class DF_CALCUL ( wx.Frame ):
 		# Connect Events
 		self.m_checkBox1.Bind( wx.EVT_CHECKBOX, self.OnCheck )
 		self.m_button.Bind( wx.EVT_BUTTON, self.m_buttonOnButtonClick )
-		self.m_button2.Bind( wx.EVT_BUTTON, self.m_buttonOnButtonClick2 )
 		self.m_button1.Bind( wx.EVT_BUTTON, self.m_buttonOnButtonClick3 )
+		self.m_button2.Bind( wx.EVT_BUTTON, self.m_buttonOnButtonClick2 )
 		self.Bind( wx.EVT_MENU, self.mOnMenuSelection2, id = self.m_menuItem2.GetId() )
 		self.Bind( wx.EVT_MENU, self.mOnMenuSelection1, id = self.m_menuItem3.GetId() )
 	
@@ -596,10 +629,10 @@ class DF_CALCUL ( wx.Frame ):
 	def m_buttonOnButtonClick( self, event ):
 		event.Skip()
 	
-	def m_buttonOnButtonClick2( self, event ):
+	def m_buttonOnButtonClick3( self, event ):
 		event.Skip()
 	
-	def m_buttonOnButtonClick3( self, event ):
+	def m_buttonOnButtonClick2( self, event ):
 		event.Skip()
 	
 	def mOnMenuSelection2( self, event ):

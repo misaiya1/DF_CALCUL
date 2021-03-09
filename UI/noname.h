@@ -45,8 +45,6 @@ class DF_CALCUL : public wxFrame
 		wxTextCtrl* m_pp;
 		wxStaticText* m_Thz;
 		wxTextCtrl* m_hz;
-		wxStaticText* m_Tgonet;
-		wxTextCtrl* m_GoNetPower;
 		wxStaticText* m_TstPower;
 		wxTextCtrl* m_StatorRePower;
 		wxStaticText* m_staticText20;
@@ -63,6 +61,8 @@ class DF_CALCUL : public wxFrame
 		wxTextCtrl* m_SetGenCurMax1;
 		wxStaticText* m_SetSatMaxI1111;
 		wxTextCtrl* m_SetSatMaxI;
+		wxStaticText* m_Tgonet;
+		wxTextCtrl* m_GoNetPower;
 		wxCheckBox* m_checkBox1;
 		wxStaticText* m_staticText221;
 		wxTextCtrl* m_Rs;
@@ -76,10 +76,7 @@ class DF_CALCUL : public wxFrame
 		wxTextCtrl* m_Lm;
 		wxStaticText* m_staticText1711;
 		wxGrid* m_grid2;
-		wxTextCtrl* m_textCtrlS;
-		wxStaticText* m_staticText171;
-		wxButton* m_button;
-		wxButton* m_button2;
+		wxScrolledWindow* m_scrolledWindow3;
 		wxTextCtrl* m_textPPP;
 		wxTextCtrl* m_textQQQUUU;
 		wxTextCtrl* m_textQQQDDD;
@@ -92,7 +89,11 @@ class DF_CALCUL : public wxFrame
 		wxStaticText* m_staticText17121;
 		wxStaticText* m_staticText171211;
 		wxStaticText* m_staticText171212;
+		wxTextCtrl* m_textCtrlS;
+		wxStaticText* m_staticText171;
+		wxButton* m_button;
 		wxButton* m_button1;
+		wxButton* m_button2;
 		wxStaticText* m_staticText16;
 		wxScrolledWindow* m_scrolledWindow1;
 		wxStaticText* m_staticText311;
@@ -141,21 +142,25 @@ class DF_CALCUL : public wxFrame
 		wxTextCtrl* m_GenVrms;
 		wxStaticText* m_staticText40;
 		wxTextCtrl* m_Torque;
+		wxStaticText* m_staticText441;
+		wxStaticText* m_staticText442;
+		wxStaticText* m_staticText402;
+		wxTextCtrl* m_Var1;
 		wxMenuBar* m_menubar1;
 		wxMenu* m_menu5;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnCheck( wxCommandEvent& event ) { event.Skip(); }
 		virtual void m_buttonOnButtonClick( wxCommandEvent& event ) { event.Skip(); }
-		virtual void m_buttonOnButtonClick2( wxCommandEvent& event ) { event.Skip(); }
 		virtual void m_buttonOnButtonClick3( wxCommandEvent& event ) { event.Skip(); }
+		virtual void m_buttonOnButtonClick2( wxCommandEvent& event ) { event.Skip(); }
 		virtual void mOnMenuSelection2( wxCommandEvent& event ) { event.Skip(); }
 		virtual void mOnMenuSelection1( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
-		DF_CALCUL( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("双馈风电机组电驱系统设计工具"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 1350,650 ), long style = wxCAPTION|wxCLOSE_BOX|wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		DF_CALCUL( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("双馈风电机组电驱系统设计工具"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 1350,600 ), long style = wxCAPTION|wxCLOSE_BOX|wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 		
 		~DF_CALCUL();
 	

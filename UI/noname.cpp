@@ -49,13 +49,6 @@ DF_CALCUL::DF_CALCUL( wxWindow* parent, wxWindowID id, const wxString& title, co
 	m_hz = new wxTextCtrl( m_scrolledWindow2, wxID_ANY, wxT("50"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer3->Add( m_hz, 0, wxALL, 5 );
 	
-	m_Tgonet = new wxStaticText( m_scrolledWindow2, wxID_ANY, wxT("上网总功率[kW]"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_Tgonet->Wrap( -1 );
-	fgSizer3->Add( m_Tgonet, 0, wxALL, 5 );
-	
-	m_GoNetPower = new wxTextCtrl( m_scrolledWindow2, wxID_ANY, wxT("3450"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer3->Add( m_GoNetPower, 0, wxALL, 5 );
-	
 	m_TstPower = new wxStaticText( m_scrolledWindow2, wxID_ANY, wxT("定子无功功率[kW]"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_TstPower->Wrap( -1 );
 	fgSizer3->Add( m_TstPower, 0, wxALL, 5 );
@@ -111,6 +104,13 @@ DF_CALCUL::DF_CALCUL( wxWindow* parent, wxWindowID id, const wxString& title, co
 	
 	m_SetSatMaxI = new wxTextCtrl( m_scrolledWindow2, wxID_ANY, wxT("1503"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer3->Add( m_SetSatMaxI, 0, wxALL, 5 );
+	
+	m_Tgonet = new wxStaticText( m_scrolledWindow2, wxID_ANY, wxT("(选填)变流器容量[kW]"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_Tgonet->Wrap( -1 );
+	fgSizer3->Add( m_Tgonet, 0, wxALL, 5 );
+	
+	m_GoNetPower = new wxTextCtrl( m_scrolledWindow2, wxID_ANY, wxT("3450"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer3->Add( m_GoNetPower, 0, wxALL, 5 );
 	
 	
 	m_scrolledWindow2->SetSizer( fgSizer3 );
@@ -232,86 +232,103 @@ DF_CALCUL::DF_CALCUL( wxWindow* parent, wxWindowID id, const wxString& title, co
 	bSlideButtZone = new wxBoxSizer( wxVERTICAL );
 	
 	wxGridSizer* gSizer2;
-	gSizer2 = new wxGridSizer( 0, 2, 0, 0 );
+	gSizer2 = new wxGridSizer( 2, 0, 0, 0 );
 	
-	wxBoxSizer* bSizer11;
-	bSizer11 = new wxBoxSizer( wxVERTICAL );
-	
-	m_textCtrlS = new wxTextCtrl( this, wxID_ANY, wxT("1725"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer11->Add( m_textCtrlS, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	m_staticText171 = new wxStaticText( this, wxID_ANY, wxT("右侧计算使用的转速点[RPM]"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL );
-	m_staticText171->Wrap( -1 );
-	bSizer11->Add( m_staticText171, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	m_button = new wxButton( this, wxID_ANY, wxT("重新单点计算"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer11->Add( m_button, 0, wxALL|wxEXPAND, 5 );
-	
-	m_button2 = new wxButton( this, wxID_ANY, wxT("报告生成"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer11->Add( m_button2, 0, wxALL|wxEXPAND, 5 );
-	
-	
-	gSizer2->Add( bSizer11, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5 );
-	
-	wxBoxSizer* bSizer12;
-	bSizer12 = new wxBoxSizer( wxVERTICAL );
+	m_scrolledWindow3 = new wxScrolledWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
+	m_scrolledWindow3->SetScrollRate( 5, 5 );
+	wxBoxSizer* bSizer14;
+	bSizer14 = new wxBoxSizer( wxVERTICAL );
 	
 	wxGridSizer* gSizer31;
 	gSizer31 = new wxGridSizer( 0, 3, 0, 0 );
 	
-	m_textPPP = new wxTextCtrl( this, wxID_ANY, wxT("1000"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_textPPP = new wxTextCtrl( m_scrolledWindow3, wxID_ANY, wxT("1000"), wxDefaultPosition, wxDefaultSize, 0 );
 	gSizer31->Add( m_textPPP, 0, wxALL, 5 );
 	
-	m_textQQQUUU = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textQQQUUU = new wxTextCtrl( m_scrolledWindow3, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	gSizer31->Add( m_textQQQUUU, 0, wxALL, 5 );
 	
-	m_textQQQDDD = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textQQQDDD = new wxTextCtrl( m_scrolledWindow3, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	gSizer31->Add( m_textQQQDDD, 0, wxALL, 5 );
 	
-	m_staticText1712 = new wxStaticText( this, wxID_ANY, wxT("输入P[kW]"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL );
+	m_staticText1712 = new wxStaticText( m_scrolledWindow3, wxID_ANY, wxT("输入P[kW]"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL );
 	m_staticText1712->Wrap( -1 );
 	gSizer31->Add( m_staticText1712, 0, wxALL, 5 );
 	
-	m_staticText17122 = new wxStaticText( this, wxID_ANY, wxT("无功上限"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL );
+	m_staticText17122 = new wxStaticText( m_scrolledWindow3, wxID_ANY, wxT("定子无功上限"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL );
 	m_staticText17122->Wrap( -1 );
 	gSizer31->Add( m_staticText17122, 0, wxALL, 5 );
 	
-	m_staticText171221 = new wxStaticText( this, wxID_ANY, wxT("无功下限"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL );
+	m_staticText171221 = new wxStaticText( m_scrolledWindow3, wxID_ANY, wxT("定子无功下限"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL );
 	m_staticText171221->Wrap( -1 );
 	gSizer31->Add( m_staticText171221, 0, wxALL, 5 );
 	
-	m_textQQQ = new wxTextCtrl( this, wxID_ANY, wxT("1000"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_textQQQ = new wxTextCtrl( m_scrolledWindow3, wxID_ANY, wxT("1000"), wxDefaultPosition, wxDefaultSize, 0 );
 	gSizer31->Add( m_textQQQ, 0, wxALL, 5 );
 	
-	m_textPPPUUU = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textPPPUUU = new wxTextCtrl( m_scrolledWindow3, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	gSizer31->Add( m_textPPPUUU, 0, wxALL, 5 );
 	
-	m_textPPPDDD = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textPPPDDD = new wxTextCtrl( m_scrolledWindow3, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	gSizer31->Add( m_textPPPDDD, 0, wxALL, 5 );
 	
-	m_staticText17121 = new wxStaticText( this, wxID_ANY, wxT("输入Q[kVar]"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL );
+	m_staticText17121 = new wxStaticText( m_scrolledWindow3, wxID_ANY, wxT("输入Q[kVar]"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL );
 	m_staticText17121->Wrap( -1 );
 	gSizer31->Add( m_staticText17121, 0, wxALL, 5 );
 	
-	m_staticText171211 = new wxStaticText( this, wxID_ANY, wxT("有功上限"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL );
+	m_staticText171211 = new wxStaticText( m_scrolledWindow3, wxID_ANY, wxT("定子有功上限"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL );
 	m_staticText171211->Wrap( -1 );
 	gSizer31->Add( m_staticText171211, 0, wxALL, 5 );
 	
-	m_staticText171212 = new wxStaticText( this, wxID_ANY, wxT("有功下限"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL );
+	m_staticText171212 = new wxStaticText( m_scrolledWindow3, wxID_ANY, wxT("定子有功下限"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL );
 	m_staticText171212->Wrap( -1 );
 	gSizer31->Add( m_staticText171212, 0, wxALL, 5 );
 	
 	
-	bSizer12->Add( gSizer31, 1, wxEXPAND, 5 );
+	bSizer14->Add( gSizer31, 1, wxEXPAND, 5 );
+	
+	
+	m_scrolledWindow3->SetSizer( bSizer14 );
+	m_scrolledWindow3->Layout();
+	bSizer14->Fit( m_scrolledWindow3 );
+	gSizer2->Add( m_scrolledWindow3, 1, wxEXPAND | wxALL, 5 );
+	
+	wxBoxSizer* bSizer11;
+	bSizer11 = new wxBoxSizer( wxHORIZONTAL );
+	
+	wxGridSizer* gSizer5;
+	gSizer5 = new wxGridSizer( 2, 2, 0, 0 );
+	
+	wxBoxSizer* bSizer134;
+	bSizer134 = new wxBoxSizer( wxVERTICAL );
+	
+	m_textCtrlS = new wxTextCtrl( this, wxID_ANY, wxT("1725"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer134->Add( m_textCtrlS, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	m_staticText171 = new wxStaticText( this, wxID_ANY, wxT("右侧计算使用的转速点[RPM]"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL );
+	m_staticText171->Wrap( -1 );
+	bSizer134->Add( m_staticText171, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	
+	gSizer5->Add( bSizer134, 1, wxEXPAND, 5 );
+	
+	m_button = new wxButton( this, wxID_ANY, wxT("重新单点计算"), wxDefaultPosition, wxDefaultSize, 0 );
+	gSizer5->Add( m_button, 1, wxALL|wxEXPAND, 5 );
 	
 	m_button1 = new wxButton( this, wxID_ANY, wxT("有无功能力边界计算"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer12->Add( m_button1, 0, wxALL, 5 );
+	gSizer5->Add( m_button1, 1, wxALL|wxEXPAND, 5 );
+	
+	m_button2 = new wxButton( this, wxID_ANY, wxT("报告生成"), wxDefaultPosition, wxDefaultSize, 0 );
+	gSizer5->Add( m_button2, 1, wxALL|wxEXPAND, 5 );
 	
 	
-	gSizer2->Add( bSizer12, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALL, 5 );
+	bSizer11->Add( gSizer5, 1, wxEXPAND, 5 );
 	
 	
-	bSlideButtZone->Add( gSizer2, 0, wxEXPAND, 5 );
+	gSizer2->Add( bSizer11, 1, wxALIGN_CENTER_HORIZONTAL|wxALL, 5 );
+	
+	
+	bSlideButtZone->Add( gSizer2, 1, wxEXPAND, 5 );
 	
 	
 	bSizer5->Add( bSlideButtZone, 0, wxEXPAND, 5 );
@@ -503,6 +520,21 @@ DF_CALCUL::DF_CALCUL( wxWindow* parent, wxWindowID id, const wxString& title, co
 	m_Torque = new wxTextCtrl( m_scrolledWindow1, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer4->Add( m_Torque, 0, wxALL, 5 );
 	
+	m_staticText441 = new wxStaticText( m_scrolledWindow1, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText441->Wrap( -1 );
+	fgSizer4->Add( m_staticText441, 0, wxALL, 5 );
+	
+	m_staticText442 = new wxStaticText( m_scrolledWindow1, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText442->Wrap( -1 );
+	fgSizer4->Add( m_staticText442, 0, wxALL, 5 );
+	
+	m_staticText402 = new wxStaticText( m_scrolledWindow1, wxID_ANY, wxT("网侧无功功率最大值[kVar]"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText402->Wrap( -1 );
+	fgSizer4->Add( m_staticText402, 0, wxALL, 5 );
+	
+	m_Var1 = new wxTextCtrl( m_scrolledWindow1, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer4->Add( m_Var1, 0, wxALL, 5 );
+	
 	
 	bSizer71->Add( fgSizer4, 1, wxEXPAND, 5 );
 	
@@ -538,8 +570,8 @@ DF_CALCUL::DF_CALCUL( wxWindow* parent, wxWindowID id, const wxString& title, co
 	// Connect Events
 	m_checkBox1->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( DF_CALCUL::OnCheck ), NULL, this );
 	m_button->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DF_CALCUL::m_buttonOnButtonClick ), NULL, this );
-	m_button2->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DF_CALCUL::m_buttonOnButtonClick2 ), NULL, this );
 	m_button1->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DF_CALCUL::m_buttonOnButtonClick3 ), NULL, this );
+	m_button2->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DF_CALCUL::m_buttonOnButtonClick2 ), NULL, this );
 	m_menu5->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( DF_CALCUL::mOnMenuSelection2 ), this, m_menuItem2->GetId());
 	m_menu5->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( DF_CALCUL::mOnMenuSelection1 ), this, m_menuItem3->GetId());
 }
@@ -549,7 +581,7 @@ DF_CALCUL::~DF_CALCUL()
 	// Disconnect Events
 	m_checkBox1->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( DF_CALCUL::OnCheck ), NULL, this );
 	m_button->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DF_CALCUL::m_buttonOnButtonClick ), NULL, this );
-	m_button2->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DF_CALCUL::m_buttonOnButtonClick2 ), NULL, this );
 	m_button1->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DF_CALCUL::m_buttonOnButtonClick3 ), NULL, this );
+	m_button2->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DF_CALCUL::m_buttonOnButtonClick2 ), NULL, this );
 	
 }
