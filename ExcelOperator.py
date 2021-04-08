@@ -160,14 +160,11 @@ class MyFrame(DF_CALCUL):
                 self.Close(True)
             dlg.Destroy()
 
-
     def m_buttonOnButtonClick3(self, event):
-        print("press button3")          # 无功边界
+        print("press button3")  # 无功边界
         self.DoWork(1)
 
         self.Plot_Var_Abili(1)
-
-
 
     def mOnMenuSelection2(self, event):
         dlg = wx.MessageDialog(None,
@@ -189,7 +186,6 @@ class MyFrame(DF_CALCUL):
         # self.m_textCtrlS.Value = ("%8.3f" % temp)
 
     def DoWork(self, netVotGain):
-
 
         plt.close('all')
         # slider input part
@@ -216,7 +212,7 @@ class MyFrame(DF_CALCUL):
         C2 = GoNetPower
         StatorRePower = float(self.m_StatorRePower.GetValue()) * 1E3  # 定子无功
         D2 = StatorRePower
-        RotorOpenVoltage = float(self.m_RotorOpen.GetValue())  # 转子开口电压
+        RotorOpenVoltage = float(self.m_RotorOpen.GetValue()) * netVotGain # 转子开口电压
         E2 = RotorOpenVoltage
         GridVRMS = float(self.m_GridVRMS.GetValue()) * netVotGain  # 电网电压
         F2 = GridVRMS
@@ -305,7 +301,7 @@ class MyFrame(DF_CALCUL):
                 iGenRpm.append(float(temp1))
                 iGoNetPower.append(float(temp2) * 1E3)
                 tempMin = min(tempMin, float(self.m_grid2.GetCellValue(0, i)))
-                tempMax = max(tempMin, float(self.m_grid2.GetCellValue(0, i)))
+                tempMax = max(tempMax, float(self.m_grid2.GetCellValue(0, i)))
 
                 if GenRpm == temp1:  # 包含
                     baohan = 1
@@ -331,13 +327,25 @@ class MyFrame(DF_CALCUL):
             print('tempMax %s' % tempMax)
             self.m_textCtrlS.SetValue(str(tempMax))
 
+        # 队列对iGenRpm进行排序，用index排序iGoNetPower
+        iGenRpm = np.array(iGenRpm)
+        iGoNetPower = np.array(iGoNetPower)
+
+        index = np.argsort(iGenRpm)
+        iGenRpm = iGenRpm[index]
+        iGoNetPower = iGoNetPower[index]
+
+
+
         # 队列最后加入 单点值
-        iGenRpm.append(GenRpm)
+        #iGenRpm.append(GenRpm)
+        iGenRpm = np.append(iGenRpm, GenRpm)
         if baohan == 1:
-            iGoNetPower.append(tempGoNet * 1E3)
+            #iGoNetPower.append(tempGoNet * 1E3)
+            iGoNetPower = np.append(iGoNetPower, tempGoNet * 1E3)
         else:
             tempGoNet = (GenRpm - tempLeft) / (tempRight - tempLeft) * (tempRight1 - tempLeft1) + tempLeft1
-            iGoNetPower.append(tempGoNet * 1E3)
+            iGoNetPower = np.append(iGoNetPower, tempGoNet * 1E3)
 
         n = n + 1
         ##########################################################################作图
@@ -406,13 +414,12 @@ class MyFrame(DF_CALCUL):
             if iGenRpm[i] == TongBuZhuanSu:
                 iGenRpm[i] = iGenRpm[i] + 1
 
-
             iZhuanChaLv[i] = (TongBuZhuanSu - iGenRpm[i]) / TongBuZhuanSu  # 转差率
             iQ2[i] = iZhuanChaLv[i]
 
-            iNetMaxVar[i] = np.sqrt(GoNetPower**2 - ((iZhuanChaLv[i]/(1-iZhuanChaLv[i]))*iGoNetPower[i])**2)
+            iNetMaxVar[i] = np.sqrt(GoNetPower ** 2 - ((iZhuanChaLv[i] / (1 - iZhuanChaLv[i])) * iGoNetPower[i]) ** 2)
 
-            print(GoNetPower,iGoNetPower[i])
+            print(GoNetPower, iGoNetPower[i])
             iStatorAPower[i] = iGoNetPower[i] / (1 - iZhuanChaLv[i])  # 定子有功
             iR2[i] = iStatorAPower[i]
             iRotorAPower[i] = iStatorAPower[i] * iZhuanChaLv[i]  # 转子有功
@@ -472,7 +479,6 @@ class MyFrame(DF_CALCUL):
             iTotalAPower[i] = iStatorAPower[i] + iRotorAPower[i]
             iGridrms[i] = abs(iNetIrms[i]) + abs(iStatorIrms[i])
 
-
         # output part
         print('Torque = %f' % iTorque[-1])
         print('iU2 %f' % iU2[-1])
@@ -508,9 +514,9 @@ class MyFrame(DF_CALCUL):
         self.m_GenVrms.Value = ("%.3f" % iGenVrms[-1])  #
         self.m_Torque.Value = ("%.3f" % iTorque[-1])  #
 
-        self.m_Var1.Value = ("%.3f" % (iNetMaxVar[-1]/1000))
+        self.m_Var1.Value = ("%.3f" % (iNetMaxVar[-1] / 1000))
         print("------------")
-        print(iNetMaxVar[-1]/1000)
+        print(iNetMaxVar[-1] / 1000)
 
         ######################################################################################
 
@@ -540,7 +546,9 @@ class MyFrame(DF_CALCUL):
         gongLvTu.set_xlabel('generetor speed[rpm]')
         gongLvTu.set_ylabel('[kW]')
         gongLvTu.legend()
-
+        print(iGenRpm_1)
+        print(iTotalAPower_1)
+        print("tempMax = %s" %tempMax)
         # 标注额定点
         for i in range(n - 1):
             gongLvTu.scatter(iGenRpm_1[i], (iStatorAPower_1[i]), s=30, color='gray')
@@ -753,11 +761,9 @@ class MyFrame(DF_CALCUL):
 
         """:type:HTTPResponse"""
 
-        global es,er,tempJWJX,data, Pmax,Qmax,Puplim,Quplim,Ppoint,Qpoint
+        global es, er, tempJWJX, data, Pmax, Qmax, Puplim, Quplim, Ppoint, Qpoint
         Ppoint = float(self.m_textPPP.GetValue()) * 1000
         Qpoint = float(self.m_textQQQ.GetValue()) * 1000
-
-
 
         xss = Xs + Xm  # 定子电抗
         print("xss = %.3f" % xss)
@@ -766,19 +772,17 @@ class MyFrame(DF_CALCUL):
 
         es = 3 * G2 / 1.414 * float(self.m_SetSatMaxI.GetValue())  # 定子电流极限圆半径
         er = 3 * G2 / 1.414 * (
-                    float(self.m_SetGenCurMax1.GetValue()) * RotorOpenVoltage / GridVRMS) * Xm__Xss  # 转子电流极限圆半径
+                float(self.m_SetGenCurMax1.GetValue()) * RotorOpenVoltage / GridVRMS) * Xm__Xss  # 转子电流极限圆半径
         print("es = %.3f" % es)
         print("er = %.3f" % er)
 
-        #输入无功求有功最大值
-        Puplim = min(np.sqrt(es**2 - Qpoint**2),np.sqrt(er**2 - (Qpoint-tempJWJX)**2))
+        # 输入无功求有功最大值
+        Puplim = min(np.sqrt(es ** 2 - Qpoint ** 2), np.sqrt(er ** 2 - (Qpoint - tempJWJX) ** 2))
         # 输入有功求无功最大值
-        Quplim = min(np.sqrt(es**2 - Ppoint**2),np.sqrt(er**2 - Ppoint**2)+tempJWJX)
+        Quplim = min(np.sqrt(es ** 2 - Ppoint ** 2), np.sqrt(er ** 2 - Ppoint ** 2) + tempJWJX)
 
         print("PQUP = ")
-        print(Puplim,Quplim)
-
-
+        print(Puplim, Quplim)
 
         # x轴
         x = np.linspace(-max(es, er) - abs(tempJWJX) - 0, max(es, er) + abs(tempJWJX) + 0, 20000)  # x 轴范围
@@ -817,11 +821,11 @@ class MyFrame(DF_CALCUL):
         #             arrowprops=dict(facecolor='green', arrowstyle="->", connectionstyle="arc3,rad=.2"),
         #             )
 
-        self.m_textQQQUUU.Value = ("%.3f" % (Quplim/1000))
-        self.m_textQQQDDD.Value = ("%.3f" % (tempJWJX/1000))  #
+        self.m_textQQQUUU.Value = ("%.3f" % (Quplim / 1000))
+        self.m_textQQQDDD.Value = ("%.3f" % (tempJWJX / 1000))  #
 
-        self.m_textPPPUUU.Value = ("%.3f" % (Puplim/1000))
-        self.m_textPPPDDD.Value = ("%.3f" % 0)                #
+        self.m_textPPPUUU.Value = ("%.3f" % (Puplim / 1000))
+        self.m_textPPPDDD.Value = ("%.3f" % 0)  #
 
         plt.legend()
         ##########################################################
@@ -865,9 +869,7 @@ class MyFrame(DF_CALCUL):
 
         data.append([min((er + tempJWJX), es), 0])
 
-
         # 寻找data列表Y值最高点。
-
 
         # 生成阴影部分 其实是多边形
         poly = Polygon(data, facecolor='0.9', edgecolor='0.1', label="定子电流极限")
@@ -884,11 +886,10 @@ class MyFrame(DF_CALCUL):
         Qmax2 = (sorted(ixy, key=lambda x: x[0]))[-1]
         Pmax2 = (sorted(ixy, key=lambda x: x[1]))[-1]
 
-
-        ax.annotate('Pmax = %.1f'%Pmax2[1], xy=Pmax2, xytext= np.sum([Pmax2,[0,-5E5]],axis=0), color='g',
+        ax.annotate('Pmax = %.1f' % Pmax2[1], xy=Pmax2, xytext=np.sum([Pmax2, [0, -5E5]], axis=0), color='g',
                     arrowprops=dict(facecolor='green', arrowstyle="->", connectionstyle="arc3,rad=.2"),
                     )
-        ax.annotate('Qmax = %.1f'%Qmax2[0], xy=Qmax2, xytext=np.sum([Qmax2,[-1E6,-3E5]],axis=0), color='g',
+        ax.annotate('Qmax = %.1f' % Qmax2[0], xy=Qmax2, xytext=np.sum([Qmax2, [-1E6, -3E5]], axis=0), color='g',
                     arrowprops=dict(facecolor='green', arrowstyle="->", connectionstyle="arc3,rad=.2"),
                     )
 
@@ -912,7 +913,6 @@ class MyFrame(DF_CALCUL):
         plt.savefig(outputFolderName + r"\fig_VarAbi.png", dpi=1000)
         if show == 1:
             plt.show()
-
 
         plt.close('all')
 
@@ -1145,6 +1145,10 @@ class MyFrame(DF_CALCUL):
 
         ######## 能力边界
         document.add_heading('有功、无功能力边界', level=1)
+        paragraph = document.add_paragraph('定子有无功能力范围：')
+        run = paragraph.add_run("")
+        run = paragraph.add_run("根据用户界面输入的“（选填）机侧变流器最大电流”与“（选填）发电机定子最大电流”等参数，计算发电机定子侧的无功功率约束关系。")
+
         paragraph = document.add_paragraph()
         paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
         run = paragraph.add_run("")
@@ -1155,29 +1159,27 @@ class MyFrame(DF_CALCUL):
 
         document.add_paragraph('根据指定的定子无功功率值，计算有功输出最大值。')
 
-        tempStr = "Pmax = "
+        tempStr = "所有条件下，定子有功功率最大值 Pmax = "
         tempStr = tempStr + "%.3f" % (Pmax / 1000)
         tempStr = tempStr + "[kW]  \n"
-        tempStr = tempStr+ "Ppoint_max = "
+        tempStr = tempStr + "无功功率确定条件下 Ppoint_max = "
         tempStr = tempStr + "%.3f" % (Puplim / 1000)
-        tempStr = tempStr + "[kW]  \t"
-        tempStr = tempStr+ "When Qpoint = %.0f [kVar]"% (Qpoint / 1000)
+        tempStr = tempStr + "[kW]，"
+        tempStr = tempStr + "当定子无功功率确定为 Qpoint = %.0f [kVar]" % (Qpoint / 1000)
         document.add_paragraph(tempStr)
 
         document.add_paragraph('根据指定的定子有功功率值，计算无功输出最大值。')
-        tempStr = "Qmax = "
+        tempStr = "所有条件下，定子无功功率最大值 Qmax = "
         tempStr = tempStr + "%.3f" % (Qmax / 1000)
         tempStr = tempStr + "[kVar]\n"
-        tempStr = tempStr +"Qpoint_max = "
+        tempStr = tempStr + "有功功率确定条件下 Qpoint_max = "
         tempStr = tempStr + "%.3f" % (Quplim / 1000)
-        tempStr = tempStr + "[kVar]\t"
-        tempStr = tempStr+ "When Ppoint = %.0f [kW]"% (Ppoint / 1000)
+        tempStr = tempStr + "[kVar]，"
+        tempStr = tempStr + "当定子有功功率确定为 Ppoint = %.0f [kW]" % (Ppoint / 1000)
         document.add_paragraph(tempStr)
 
-        #document.add_paragraph()
+        # document.add_paragraph()
         document.add_page_break()
-
-
 
         #
         # ax.annotate(tempStr, xy=(Qpoint, Puplim), xytext=(Qpoint-3E6, Puplim + 0), color='g',
@@ -1192,6 +1194,9 @@ class MyFrame(DF_CALCUL):
 
         ########结论
         document.add_heading('结论', level=1)
+        paragraph = document.add_paragraph('根据用户在界面上输入的选填内容，进行设计合理性判断。')
+
+
         table_para = document.add_table(rows=5, cols=3, style='Table Grid')
 
         hdr_cells = table_para.columns[0].cells
