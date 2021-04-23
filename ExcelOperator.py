@@ -32,6 +32,13 @@ Root3 = 1.732
 ''' 函数：返回变量是否被定义过 '''
 
 
+def resource_path(relative_path):
+    if getattr(sys, 'frozen', False): #是否Bundle Resource
+        base_path = sys._MEIPASS
+    else:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
 def isset(v):
     try:
         type(eval(v))
@@ -950,8 +957,10 @@ class MyFrame(DF_CALCUL):
 
         self.DoWork(1)
         #####################################################################创建PPT,修改文本框
+        filename = resource_path(os.path.join("pptx", "abcde.pptx"))
+
         print('ppt start')
-        pptx = Presentation()
+        pptx = Presentation(filename)
         for slide in pptx.slides:
             # 遍历幻灯片页的所有形状
             print("slide found")
