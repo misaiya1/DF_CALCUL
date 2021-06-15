@@ -1,11 +1,12 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 block_cipher = None
+added_files =[( 'data', 'data')]
 
 a = Analysis(['main.py'],
              pathex=['D:\\Personal\\Desktop\\skxxgj\\DFIG\\py\\DF_CALCUL'],
              binaries=[],
-             datas=[('pptx', 'pptx')],
+             datas=[],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
@@ -22,7 +23,7 @@ exe = EXE(pyz,
           a.zipfiles,
           a.datas,
           [],
-          name='main',
+          name='双馈风电机组电驱系统设计工具_V1_4',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,

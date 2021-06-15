@@ -1,17 +1,17 @@
-#!/usr/bin/env python
+5  # !/usr/bin/env python
 # _*_ coding:utf-8 _*_
 from UI.noname import DF_CALCUL
 import numpy as np
 from math import pi
 import datetime
-
+#import time
 import os
-import sys
+#import sys
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import Polygon
 import wx
 import wx.xrc
-import math
+#import math
 from docx import Document
 from docx.shared import Inches
 from docx.shared import Pt
@@ -19,10 +19,10 @@ from docx.shared import RGBColor
 from docx.oxml.ns import qn
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 
-from docxtpl import DocxTemplate
-from pptx import Presentation
-from pptx_tools import utils
-from pptx.util import Inches, Pt
+# from docxtpl import DocxTemplate
+# from pptx import Presentation
+# from pptx_tools import utils
+# from pptx.util import Inches, Pt
 
 myChecked = False
 NetFreq = 50
@@ -32,12 +32,13 @@ Root3 = 1.732
 ''' 函数：返回变量是否被定义过 '''
 
 
-def resource_path(relative_path):
-    if getattr(sys, 'frozen', False): #是否Bundle Resource
-        base_path = sys._MEIPASS
-    else:
-        base_path = os.path.abspath(".")
-    return os.path.join(base_path, relative_path)
+# def resource_path(relative_path):
+#     if getattr(sys, 'frozen', False):  # 是否Bundle Resource
+#         base_path = sys._MEIPASS
+#     else:
+#         base_path = os.path.abspath(".")
+#     return os.path.join(base_path, relative_path)
+
 
 def isset(v):
     try:
@@ -52,12 +53,13 @@ def func_cycle(x, e, x_o, y_o):
     return np.sqrt((e ** 2 - (x - x_o) ** 2)) + y_o
 
 
+
 class MyFrame(DF_CALCUL):
     ''' 创建输出路径  '''
     global cwd
+    global outputFolderName
     cwd = os.getcwd()
     print(cwd)
-    global outputFolderName
 
     outputFolderName = cwd + r'\fig_save'  # + datetime.datetime.now().strftime('%Y.%m.%d.%H.%M')
     outPathExists = os.path.exists(outputFolderName)
@@ -137,7 +139,7 @@ class MyFrame(DF_CALCUL):
         # self.Plot_Var_Abili(1)
         self.PlotAll()
 
-    def m_buttonOnButtonClick2(self, event):
+    def m_buttonOnButtonClick2(self, event):  # 报告
         print("press button2")
         self.DoWork(1)
         self.Plot1()
@@ -182,7 +184,7 @@ class MyFrame(DF_CALCUL):
         dlg.Destroy()
 
     def mOnMenuSelection1(self, event):
-        dlg = wx.MessageDialog(None, u"版本:V1.3", u"确认", wx.YES_DEFAULT | wx.ICON_QUESTION)
+        dlg = wx.MessageDialog(None, u"版本:V1.4", u"确认", wx.YES_DEFAULT | wx.ICON_QUESTION)
         if dlg.ShowModal() == wx.ID_YES:
             self.Close(True)
         dlg.Destroy()
@@ -219,7 +221,7 @@ class MyFrame(DF_CALCUL):
         C2 = GoNetPower
         StatorRePower = float(self.m_StatorRePower.GetValue()) * 1E3  # 定子无功
         D2 = StatorRePower
-        RotorOpenVoltage = float(self.m_RotorOpen.GetValue()) * netVotGain # 转子开口电压
+        RotorOpenVoltage = float(self.m_RotorOpen.GetValue()) * netVotGain  # 转子开口电压
         E2 = RotorOpenVoltage
         GridVRMS = float(self.m_GridVRMS.GetValue()) * netVotGain  # 电网电压
         F2 = GridVRMS
@@ -342,13 +344,11 @@ class MyFrame(DF_CALCUL):
         iGenRpm = iGenRpm[index]
         iGoNetPower = iGoNetPower[index]
 
-
-
         # 队列最后加入 单点值
-        #iGenRpm.append(GenRpm)
+        # iGenRpm.append(GenRpm)
         iGenRpm = np.append(iGenRpm, GenRpm)
         if baohan == 1:
-            #iGoNetPower.append(tempGoNet * 1E3)
+            # iGoNetPower.append(tempGoNet * 1E3)
             iGoNetPower = np.append(iGoNetPower, tempGoNet * 1E3)
         else:
             tempGoNet = (GenRpm - tempLeft) / (tempRight - tempLeft) * (tempRight1 - tempLeft1) + tempLeft1
@@ -555,7 +555,7 @@ class MyFrame(DF_CALCUL):
         gongLvTu.legend()
         print(iGenRpm_1)
         print(iTotalAPower_1)
-        print("tempMax = %s" %tempMax)
+        print("tempMax = %s" % tempMax)
         # 标注额定点
         for i in range(n - 1):
             gongLvTu.scatter(iGenRpm_1[i], (iStatorAPower_1[i]), s=30, color='gray')
@@ -923,6 +923,10 @@ class MyFrame(DF_CALCUL):
 
         plt.close('all')
 
+    def OnExit(self, event):
+        """Close the frame, terminating the application."""
+        self.Close(True)
+
     def Docu(self):
 
         '''save %0 data'''
@@ -957,38 +961,40 @@ class MyFrame(DF_CALCUL):
 
         self.DoWork(1)
         #####################################################################创建PPT,修改文本框
-        filename = resource_path(os.path.join("pptx", "abcde.pptx"))
+        # #filename = resource_path(os.path.join("pptx", "abcde.pptx"))
+        #
+        # print('ppt start')
+        # global pptx
+        # pptx = Presentation(r'data\mo_ban.pptx')
+        # for slide in pptx.slides:
+        #     # 遍历幻灯片页的所有形状
+        #     print("slide found")
+        #     for shape in slide.shapes:
+        #         print("shape found")
+        #         # 判断形状是否含有文本框，如果含有则顺序运行代码
+        #         if shape.has_text_frame:
+        #
+        #             # 获取文本框
+        #             text_frame = shape.text_frame
+        #             # 遍历文本框中的所有段落
+        #             for paragraph in text_frame.paragraphs:
+        #                 paragraph.text = paragraph.text.replace('X1', str(format(0.001, '.5f')) + '[ohm]')  #Xs
+        #                 paragraph.text = paragraph.text.replace('X2', str(format(0.001, '.5f')) + '[ohm]')  #Xr
+        #                 paragraph.text = paragraph.text.replace('R1', str(format(0.001, '.5f')) + '[ohm]')  #Rs
+        #                 paragraph.text = paragraph.text.replace('R2', str(format(0.001, '.5f')) + '[ohm]')  #Rr
+        #
+        #                 paragraph.text = paragraph.text.replace('XNN', str(format(0.001, '.5f')) + '[ohm]')  #Xm
+        #                 paragraph.font.size = Pt(22)
+        #
+        # save_ppt = outputFolderName + r"\fig_x.pptx"
+        # print(save_ppt)
+        # save_ppt_fun(pptx, save_ppt)
 
-        print('ppt start')
-        pptx = Presentation(filename)
-        for slide in pptx.slides:
-            # 遍历幻灯片页的所有形状
-            print("slide found")
-            for shape in slide.shapes:
-                print("shape found")
-                # 判断形状是否含有文本框，如果含有则顺序运行代码
-                if shape.has_text_frame:
-
-                    # 获取文本框
-                    text_frame = shape.text_frame
-                    # 遍历文本框中的所有段落
-                    for paragraph in text_frame.paragraphs:
-                        paragraph.text = paragraph.text.replace('X1', str(format(Xs, '.5f')) + '[ohm]')
-                        paragraph.text = paragraph.text.replace('X2', str(format(Xr, '.5f')) + '[ohm]')
-                        paragraph.text = paragraph.text.replace('R1', str(format(Rs, '.5f')) + '[ohm]')
-                        paragraph.text = paragraph.text.replace('R2', str(format(Rr, '.5f')) + '[ohm]')
-
-                        paragraph.text = paragraph.text.replace('XNN', str(format(Xm, '.5f')) + '[ohm]')
-                        paragraph.font.size = Pt(22)
-
-        #####################################################################保存PPT,另存为png
-        save_ppt = outputFolderName + r'\fig_x.pptx'
-        pptx.save(save_ppt)
-
-        utils.save_pptx_as_png(outputFolderName, save_ppt, overwrite_folder=True)
-        fig_x_dir = outputFolderName + r'\幻灯片1.PNG'
-        print('ppt end')
+        # utils.save_pptx_as_png(outputFolderName, save_ppt, overwrite_folder=True)
+        # fig_x_dir = outputFolderName + r'\幻灯片1.PNG'
+        # print('ppt end')
         #####################################################################创建word
+        global document
         document = Document()
         # print(dir(document))
 
@@ -1066,10 +1072,10 @@ class MyFrame(DF_CALCUL):
             paragraph = document.add_paragraph()
             paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
             run = paragraph.add_run("")
-            run.add_picture(r'.\fig_save\幻灯片1.PNG', width=Inches(5.25))
+            # run.add_picture(r'.\fig_save\幻灯片1.PNG', width=Inches(5.25))
 
-            run = document.add_paragraph('图1. 双馈发电机等效电路图')
-            run.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+            #run = document.add_paragraph('图1. 双馈发电机等效电路图')
+            #run.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
 
         except:
             pass
@@ -1098,7 +1104,7 @@ class MyFrame(DF_CALCUL):
         run = paragraph.add_run("")
         run.add_picture(r'.\fig_save\fig_power.png', width=Inches(5.25))
 
-        run = document.add_paragraph('图2. 定子/转子/总上网功率')
+        run = document.add_paragraph('图1. 定子/转子/总上网功率')
         run.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
         run = document.add_paragraph('')
         run.add_run(r'"*注：对于转子功率(Rotor Active Power)，负值表示从电网获取功率"').italic = True
@@ -1116,7 +1122,7 @@ class MyFrame(DF_CALCUL):
         run = paragraph.add_run("")
         run.add_picture(r'.\fig_save\fig_Current.png', width=Inches(5.25))
 
-        run = document.add_paragraph('图3. 定子/转子/变流器网侧/总上网电流')
+        run = document.add_paragraph('图2. 定子/转子/变流器网侧/总上网电流')
         run.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
         run = document.add_paragraph('')
         run.add_run(r'"*注：对于变流器网侧电流(Ipfc)，负值表示流向电网"').italic = True
@@ -1144,7 +1150,7 @@ class MyFrame(DF_CALCUL):
         run = paragraph.add_run("")
         run.add_picture(r'.\fig_save\fig_voltageR.png', width=Inches(5.25))
 
-        run = document.add_paragraph('图4. 转子线电压')
+        run = document.add_paragraph('图3. 转子线电压')
         run.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
 
         document.add_paragraph(r'以下三个数据分别表示工况（正常电网电压）（电网90%低电压）（电网110%高电压）')
@@ -1163,7 +1169,7 @@ class MyFrame(DF_CALCUL):
         run = paragraph.add_run("")
         run.add_picture(r'.\fig_save\fig_VarAbi.png', width=Inches(5.25))
 
-        run = document.add_paragraph('图5. 定子有无功能力边界')
+        run = document.add_paragraph('图4. 定子有无功能力边界')
         run.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
 
         document.add_paragraph('根据指定的定子无功功率值，计算有功输出最大值。')
@@ -1204,7 +1210,6 @@ class MyFrame(DF_CALCUL):
         ########结论
         document.add_heading('结论', level=1)
         paragraph = document.add_paragraph('根据用户在界面上输入的选填内容，进行设计合理性判断。')
-
 
         table_para = document.add_table(rows=5, cols=3, style='Table Grid')
 
@@ -1259,93 +1264,11 @@ class MyFrame(DF_CALCUL):
             # paragraph.style.font.color.rgb = RGBColor(250,0,0)
 
         document.add_page_break()
-        document.save('双馈风电机组电驱系统设计计算报告.docx')
-        print(TF.count(False))
-        print(TF)
+        # document.save('双馈风电机组电驱系统设计计算报告.docx')
 
-        ##############################################test
+        self.Close(True)
 
-    def DocuTemp(self):
-        tdocx = Document('tpl.docx')
-        tdocx.styles['Normal'].font.name = '微软雅黑'
-        tdocx.styles['Normal']._element.rPr.rFonts.set(qn('w:eastAsia'), u'微软雅黑')
-        # tdocx.styles['Normal'].font.size = Pt(12)
+def save_all():
+    document.save('双馈风电机组电驱系统设计计算报告.docx')
 
-        tdocx.add_page_break()
-        tdocx.save('test.docx')
-
-        ##############################################test
-
-
-########################################################## 3.45 盾安 MW
-
-# self.m_grid2.SetCellValue(0, 0, '1300')  # 第1行第0个
-# self.m_grid2.SetCellValue(0, 1, '1400')
-# self.m_grid2.SetCellValue(0, 2, '1450')
-# self.m_grid2.SetCellValue(0, 3, '1550')
-# self.m_grid2.SetCellValue(0, 4, '1600')
-# self.m_grid2.SetCellValue(0, 5, '1650')
-# self.m_grid2.SetCellValue(0, 6, '1700')
-# self.m_grid2.SetCellValue(0, 7, '1750')
-# self.m_grid2.SetCellValue(0, 8, '1800')
-#
-# self.m_grid2.SetCellValue(1, 0, '1454')  # 第1行第0个
-# self.m_grid2.SetCellValue(1, 1, '1681')
-# self.m_grid2.SetCellValue(1, 2, '1851')
-# self.m_grid2.SetCellValue(1, 3, '2151')
-# self.m_grid2.SetCellValue(1, 4, '2352')
-# self.m_grid2.SetCellValue(1, 5, '2502')
-# self.m_grid2.SetCellValue(1, 6, '2710')
-# self.m_grid2.SetCellValue(1, 7, '3153')
-# self.m_grid2.SetCellValue(1, 8, '3452')
-
-########################################################## 3.35 MW
-
-# self.m_grid2.SetCellValue(0, 0, '1050')  # 第1行第0个
-# self.m_grid2.SetCellValue(0, 1, '1200')
-# self.m_grid2.SetCellValue(0, 2, '1300')
-# self.m_grid2.SetCellValue(0, 3, '1400')
-# self.m_grid2.SetCellValue(0, 4, '1550')
-# self.m_grid2.SetCellValue(0, 5, '1600')
-# self.m_grid2.SetCellValue(0, 6, '1700')
-# self.m_grid2.SetCellValue(0, 7, '1725')
-# self.m_grid2.SetCellValue(0, 8, '1770')
-#
-# self.m_grid2.SetCellValue(1, 0, '400')  # 第1行第0个
-# self.m_grid2.SetCellValue(1, 1, '700')
-# self.m_grid2.SetCellValue(1, 2, '850')
-# self.m_grid2.SetCellValue(1, 3, '1150')
-# self.m_grid2.SetCellValue(1, 4, '1500')
-# self.m_grid2.SetCellValue(1, 5, '1750')
-# self.m_grid2.SetCellValue(1, 6, '2250')
-# self.m_grid2.SetCellValue(1, 7, '3250')
-# self.m_grid2.SetCellValue(1, 8, '3350')
-
-########################################################## 3.0 鼠笼MW
-# self.m_grid2.SetCellValue(0, 0, '660.568')  # 第1行第0个
-# self.m_grid2.SetCellValue(0, 1, '779.144')
-# self.m_grid2.SetCellValue(0, 2, '896.907')
-# self.m_grid2.SetCellValue(0, 3, '1013.69')
-# self.m_grid2.SetCellValue(0, 4, '1129.12')
-# self.m_grid2.SetCellValue(0, 5, '1243.81')
-# self.m_grid2.SetCellValue(0, 6, '1357.99')
-# self.m_grid2.SetCellValue(0, 7, '1470.47')
-# self.m_grid2.SetCellValue(0, 8, '1583.24')
-# self.m_grid2.SetCellValue(0, 9, '1693.32')
-# self.m_grid2.SetCellValue(0, 10, '1725')
-# self.m_grid2.SetCellValue(0, 11, '1725')
-#
-# self.m_grid2.SetCellValue(1, 0, '59.2634')  # 第1行第0个
-# self.m_grid2.SetCellValue(1, 1, '126.16')
-# self.m_grid2.SetCellValue(1, 2, '216.215')
-# self.m_grid2.SetCellValue(1, 3, '333.262')
-# self.m_grid2.SetCellValue(1, 4, '478.754')
-# self.m_grid2.SetCellValue(1, 5, '648.541')
-# self.m_grid2.SetCellValue(1, 6, '851.05')
-# self.m_grid2.SetCellValue(1, 7, '1087.73')
-# self.m_grid2.SetCellValue(1, 8, '1366.06')
-# self.m_grid2.SetCellValue(1, 9, '1676.12')
-# self.m_grid2.SetCellValue(1, 10, '1819')
-# self.m_grid2.SetCellValue(1, 11, '3000')
-# self.m_grid2.SetCellValue(1, 11, '3000')
 '''end of file'''

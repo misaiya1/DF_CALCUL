@@ -335,7 +335,7 @@ class DF_CALCUL ( wx.Frame ):
 		self.m_button1 = wx.Button( self, wx.ID_ANY, u"有无功能力边界计算", wx.DefaultPosition, wx.DefaultSize, 0 )
 		gSizer5.Add( self.m_button1, 1, wx.ALL|wx.EXPAND, 5 )
 		
-		self.m_button2 = wx.Button( self, wx.ID_ANY, u"报告生成", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_button2 = wx.Button( self, wx.ID_ANY, u"报告生成并退出", wx.DefaultPosition, wx.DefaultSize, 0 )
 		gSizer5.Add( self.m_button2, 1, wx.ALL|wx.EXPAND, 5 )
 		
 		
